@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BATCH FIX TRANG</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<style>
+body{font-family:system-ui;background:#f4efe6;margin:0;padding:12px}
+.card{background:#fff;border:1px solid #d9e2d0;border-radius:16px;padding:14px}
+input,button{width:100%;padding:14px;border-radius:12px;border:1px solid #c5d6b8;font-size:15px;box-sizing:border-box;margin-top:8px}
+button{background:#0f2e24;color:#fff;font-weight:800}
+#log{font-size:12px;white-space:pre-wrap;background:#fcfdfb;border:1px dashed #c5d6b8;padding:8px;border-radius:10px;height:120px;overflow:auto;margin-top:8px}
+#preview{max-height:150px;overflow:auto;font-size:12px}
+iframe#renderer{position:fixed;left:0;top:0;width:500px;height:900px;opacity:0;pointer-events:none;z-index:-1;border:none;background:#fff}
+</style>
+</head>
+<body>
+<div class="card">
+<h3 style="margin:0">BATCH THU MOI - FIX TRANG TRANG</h3>
+<p style="font-size:12px;color:#5a6b5a">Excel 3 cot: A=Ten1, B=Ten2, C=Ten3. File cua ban dang la text tho nen minh se tu boc khung dep neu can.</p>
+<input id="github" value="https://raw.githubusercontent.com/LeHa-Jena/golf279/refs/heads/main/thumoi-custom.html">
+<input type="file" id="excel" accept=".xlsx,.xls,.csv">
+<button id="btn-preview">1. XEM TRUOC</button>
+<div id="preview"></div>
+<button id="btn-run" style="background:#1a5c3a">2. XUAT 42 FILE RA ZIP</button>
+<div id="log">Cho...</div>
+<div>Tien do: <span id="progress">0/0</span></div>
+</div>
+<iframe id="renderer"></iframe>
+<script>
+let rows=[];
+let templateRaw='';
+
+async function fetchTemplate(){
+  const url=document.getElementById('github').value.trim();
+  const res=await fetch(url);
+  let txt=await res.text();
+  // neu file chi co text tho (khong co <html>) thi tu boc khung giong mau cua ban
+  if(!txt.includes('<html') && !txt.includes('<div')){
+    // txt dang la text tho nhu ban up
+    const lines=txt.split('\n').filter(l=>l.trim());
+    // gia dinh 3 dong dau la 3 vi tri can dien? Minh boc khung chung
+    txt = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+      body{margin:0;background:#f4efe6;font-family:serif}
+      #full-capture{width:450px;margin:0 auto;background:#fffffe;border:1px solid #d9e2d0;border-radius:24px;overflow:hidden;padding:26px 32px}
+      [contenteditable]{border-bottom:1px dashed #b7d0a8;min-width:80px;display:inline-block;color:#0f2e24;font-weight:600}
+    </style></head><body><div id="full-capture">
+    <div style="text-align:center;font-size:42px;font-family:cursive;color:#0f2e24">Thu Moi</div>
+    <p>Kinh gui <span contenteditable="true"></span></p>
+    <p>Thang 10, Golf279 tam roi pho thi, cung nhau len cao nguyen.</p>
+    <p>Golf279 tran trong kinh moi <span contenteditable="true"></span> cung tham gia.</p>
+    <p>Hen gap <span contenteditable="true"></span> giua cao nguyen.</p>
+    <p style="font-family:cursive;font-size:24px">See you in Dalat!</p>
+    </div></body></html>`;
+  }
+  return txt;
+}
+
+document.getElementById('btn-preview').addEventListener('click', async()=>{
+  const file=document.getElementById('excel').files[0];
+  if(!file) return alert('Chon Excel');
+  const data=await file.arrayBuffer();
+  const wb=XLSX.read(data);
+  const ws=wb.Sheets[wb.SheetNames[0]];
+  const json=XLSX.utils.sheet_to_json(ws,{header:1});
+  const raw=json.slice(1);
+  rows=raw.map(r=>{
+    let c1=(r[0]||'').toString().trim();
+    let c2=(r[1]||'').toString().trim();
+    let c3=(r[2]||'').toString().trim();
+    let fname=(r[3]||'').toString().trim();
+    // BO QUA DONG TIEU DE
+    const low = c1.toLowerCase();
+    if(!c1) return null;
+    if(low==='thư mời' || low==='thu moi' || low==='ten' || low.includes('nội dung 1') || low.includes('noi dung 1')) return null;
+    // XOA TIEN TO TRUNG
+    c1 = c1.replace(/^Thư Mời[_\-\s]*/i,'').replace(/^Thu Moi[_\-\s]*/i,'').trim();
+    if(!fname) fname=`Thu Moi_${c1}.pdf`;
+    else {
+      // neu fname da co san ma bi dinh Thu Moi_Thu Moi
+      fname = fname.replace(/Thu Moi_Thư Mời.*/i, `Thu Moi_${c1}.pdf`).replace(/Thư Mời_Thư Mời.*/i, `Thu Moi_${c1}.pdf`);
+      if(!fname.toLowerCase().endsWith('.pdf')) fname+='.pdf';
+      if(!fname.startsWith('Thu Moi_') && !fname.startsWith('Thư Mời_')) fname = `Thu Moi_${fname}`;
+    }
+    return {c1,c2,c3,fname};
+  }).filter(r=>r && r.c1);
+  document.getElementById('preview').innerHTML='<table border=1 style="width:100%;border-collapse:collapse"><tr><th>c1</th><th>c2</th><th>c3</th></tr>'+rows.map(r=>`<tr><td>${r.c1}</td><td>${r.c2}</td><td>${r.c3}</td></tr>`).join('')+'</table>';
+  document.getElementById('progress').textContent=`0/${rows.length}`;
+  document.getElementById('log').textContent=`Doc ${rows.length} dong`;
+});
+
+document.getElementById('btn-run').addEventListener('click', async()=>{
+  if(!rows.length) return alert('Chua xem truoc');
+  const iframe=document.getElementById('renderer');
+  const log=document.getElementById('log');
+  templateRaw=await fetchTemplate();
+  const zip=new JSZip();
+  let count=0;
+  for(const r of rows){
+    log.textContent=`Dang xuat ${count+1}/${rows.length}: ${r.fname}`;
+    // nap template vao iframe
+    await new Promise((resolve)=>{
+      iframe.onload=resolve;
+      iframe.srcdoc=templateRaw;
+    });
+    await new Promise(res=>setTimeout(res,300));
+    const idoc=iframe.contentDocument || iframe.contentWindow.document;
+    const edits=idoc.querySelectorAll('[contenteditable]');
+    if(edits[0]) edits[0].textContent=r.c1;
+    if(edits[1]) edits[1].textContent=r.c2;
+    if(edits[2]) edits[2].textContent=r.c3;
+    // neu template goc chi co text tho, tim them
+    if(edits.length===0){
+      // fallback: thay the text Kính gửi
+      idoc.body.innerHTML = idoc.body.innerHTML.replace('Kính gửi', `Kính gửi ${r.c1}`);
+    }
+    await new Promise(res=>setTimeout(res,200));
+    const target = idoc.getElementById('full-capture') || idoc.getElementById('thu-moi-goc') || idoc.body;
+    // dam bao co kich thuoc
+    target.style.width='450px';
+    target.style.background='#ffffff';
+    const dataUrl = await htmlToImage.toPng(target, {
+      quality:1, pixelRatio:2, backgroundColor:'#ffffff',
+      width: target.scrollWidth, height: target.scrollHeight
+    });
+    // convert to pdf
+    const img=new Image(); img.src=dataUrl;
+    await new Promise(res=> img.onload=res);
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'p', unit:'px', format:[img.width, img.height], compress:true});
+    pdf.addImage(dataUrl,'PNG',0,0,img.width, img.height, undefined,'FAST');
+    const blob=pdf.output('blob');
+    zip.file(r.fname, blob);
+    count++;
+    document.getElementById('progress').textContent=`${count}/${rows.length}`;
+  }
+  log.textContent+='\nDang nen ZIP...';
+  const zipBlob=await zip.generateAsync({type:'blob'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(zipBlob);
+  a.download=`BATCH_THU_MOI_${rows.length}_FIX.zip`;
+  a.click();
+  log.textContent+='\nXong! Tai ZIP ve roi.';
+});
+</script>
+</body>
+</html>
