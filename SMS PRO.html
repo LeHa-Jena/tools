@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SMS PRO v7 FIX - DANH BẠ CHUẨN</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--border:#334155;--text:#e2e8f0;--muted:#94a3b8;--accent:#22c55e;--accent-bg:#14532d}
+*{box-sizing:border-box}body{font-family:'Be Vietnam Pro',system-ui;background:var(--bg);margin:0;padding:8px;color:var(--text)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px;max-width:960px;margin:0 auto}
+.hint{font-size:11px;color:var(--muted);line-height:1.4;margin:4px 0}
+.banner{border-radius:10px;padding:10px;font-size:12px;margin:6px 0}.banner.ok{background:#14532d;border:1px solid var(--accent);color:#dcfce7}.banner.warn{background:#422006;border:1px solid #f59e0b;color:#fef3c7}.banner.info{background:#1e3a8a;border:1px solid #3b82f6;color:#dbeafe}
+.row{display:flex;gap:6px;flex-wrap:wrap}.row>*{flex:1;min-width:100px}
+input,textarea,select,button{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;margin-top:6px}
+textarea{min-height:70px}button{background:var(--accent);color:#fff;font-weight:800;cursor:pointer;border:none}button.secondary{background:var(--border)}button.danger{background:#ef4444}button.small{padding:5px 8px;font-size:10px;width:auto}
+#log{font-size:10px;white-space:pre-wrap;background:var(--bg);border:1px dashed var(--border);padding:6px;border-radius:8px;height:60px;overflow:auto;margin-top:6px}
+.stats{display:flex;gap:6px;margin-top:6px}.stat{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:6px;text-align:center;font-size:10px}.stat b{font-size:14px;display:block}
+.tabs{display:flex;gap:4px;margin:8px 0}.tabs button{flex:1;padding:8px;font-size:11px}.tabs button.active{background:var(--accent)}
+.phonebook-search{display:flex;gap:6px;margin:6px 0}.phonebook-search input{margin:0}
+.group-chips{display:flex;gap:5px;overflow-x:auto;flex-wrap:nowrap;padding:4px 0;max-width:100%}.group-chips::-webkit-scrollbar{height:4px}
+.chip{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;white-space:nowrap}
+.chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.contact-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px;max-height:60vh;overflow:auto}
+.contact-card{display:flex;gap:10px;align-items:center;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.c-info{flex:1;min-width:0}.c-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.c-phone{font-size:11px;color:var(--muted)}
+.c-badges{display:flex;gap:3px;margin-top:2px;flex-wrap:wrap}.c-badge{font-size:9px;padding:2px 6px;border-radius:10px;background:var(--border)}.c-vga{background:#0f2e24;color:#22c55e;border:1px solid #22c55e}
+.c-actions{display:flex;flex-direction:column;gap:3px}
+#preview{max-height:45vh;overflow:auto;font-size:10px;margin-top:8px;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse}th,td{border:1px solid var(--border);padding:4px;text-align:left}th{background:var(--bg);position:sticky;top:0;font-size:10px}
+.tag{display:inline-block;border:1px solid var(--accent);color:var(--accent);padding:2px 8px;border-radius:20px;font-size:11px;margin:2px;cursor:pointer}
+.group-manage{border:1px solid var(--border);border-radius:10px;padding:8px;margin-top:8px;background:var(--bg)}
+.group-item{display:flex;justify-content:space-between;align-items:center;padding:6px;border-bottom:1px solid var(--border);font-size:12px}
+.group-item input[type=checkbox]{width:auto;margin:0}
+</style>
+</head>
+<body>
+<div class="card">
+<h3>📒 SMS PRO v7 - FIX LOGIC DANH BẠ</h3>
+<div id="sharedBanner" class="banner info" style="display:none"></div>
+<div class="stats">
+<div class="stat"><b id="count-total">0</b>Tổng</div>
+<div class="stat"><b id="count-shared">0</b>Chung</div>
+<div class="stat"><b id="count-group">0</b>Nhóm</div>
+<div class="stat"><b id="count-vga">0</b>VGA</div>
+</div>
+<div class="tabs">
+<button class="active" data-tab="contacts">📒 DANH BẠ</button>
+<button data-tab="send">📤 GỬI</button>
+<button data-tab="admin">⚙️ ADMIN</button>
+</div>
+<div id="tab-contacts">
+<div class="phonebook-search">
+<input id="searchContact" placeholder="🔍 Tìm tên, SĐT, VGA, nhóm...">
+<select id="filterContactGroup" style="max-width:120px"><option value="all">Tất cả nhóm</option></select>
+<select id="filterContactSource" style="max-width:100px"><option value="all">Tất cả</option><option value="shared">🌐 Chung</option><option value="offline">💾 Offline</option></select>
+</div>
+<div class="group-chips" id="groupChips"></div>
+<div class="contact-list" id="contactList"></div>
+<div class="hint" id="contactCountHint"></div>
+</div>
+<div id="tab-send" style="display:none">
+<div class="row"><select id="filterGroup"><option value="all">Tất cả nhóm</option></select><select id="filterSource"><option value="all">Chung+Offline</option><option value="shared">Chỉ chung</option><option value="offline">Chỉ offline</option></select></div>
+<label class="hint">Mẫu: {ten} {sdt} {nhom} {vga}</label>
+<div><span class="tag" onclick="insertTag('{ten}')">{ten}</span><span class="tag" onclick="insertTag('{vga}')">{vga}</span><span class="tag" onclick="insertTag('{nhom}')">{nhom}</span></div>
+<textarea id="template">Kinh gui {ten} (VGA {vga}), Golf279 moi tham gia Dalat 22-23/10. golf279.com/dalat</textarea>
+<div class="row"><label style="font-size:10px"><input type="checkbox" id="boDau" checked style="width:auto"> Bỏ dấu</label><label style="font-size:10px"><input type="checkbox" id="delayCheck" checked style="width:auto"> Nghỉ 5s</label></div>
+<button id="btn-preview" class="secondary">LỌC & XEM TRƯỚC</button>
+<div class="row"><button id="btn-send" style="flex:2">🚀 GỬI BULK</button><button id="btn-stop" class="danger" style="flex:0.5">DỪNG</button></div>
+<div class="row"><button id="btn-next" class="secondary" disabled>→ TIẾP</button><button id="btn-select-all" class="secondary">CHỌN/BỎ</button></div>
+<div id="preview"></div>
+</div>
+<div id="tab-admin" style="display:none">
+<div class="banner info">Logic mới: A=Tên, B=SĐT, C=Nhóm, D=VGA. Nhóm rác (số) tự loại. Có nút dọn rác và xóa hàng loạt nhóm.</div>
+<div class="row"><input type="file" id="excel" accept=".xlsx,.xls,.csv" style="flex:2"><select id="groupAssign" style="flex:1"><option value="">-- Gán nhóm --</option></select></div>
+<div class="row"><button id="btn-save-offline" class="secondary">💾 Lưu offline</button><button id="btn-save-shared" style="background:#f59e0b;color:#000">📌 Thêm chung</button></div>
+<div id="adminPreview" class="hint"></div>
+<div class="group-manage">
+<b>📁 Quản lý nhóm (logic danh bạ chuẩn)</b>
+<div class="hint">Chỉ hiện nhóm hợp lệ (chữ, không phải số VGA). Có chọn hàng loạt để xóa.</div>
+<div class="row"><input id="newGroupName" placeholder="Tên nhóm mới"><button id="btn-create-group" style="flex:0.5">+ Tạo</button></div>
+<div class="row"><button id="btn-clean-groups" class="secondary">🧹 Dọn nhóm rác (số, trống)</button><button id="btn-delete-selected-groups" class="danger">🗑 Xóa nhóm đã chọn</button><button id="btn-reset-groups" class="secondary">♻️ Reset về mặc định</button></div>
+<div id="groupList"></div>
+</div>
+<div class="row"><button id="btn-export-contacts-json" class="secondary">📤 Xuất contacts.json</button><button id="btn-export-backup" class="secondary">📤 Backup</button></div>
+<input type="file" id="importJson" accept=".json" style="display:none">
+<div class="row"><button id="btn-import-json" class="secondary">📥 Nhập JSON</button><button id="btn-clear-shared" class="danger">Xóa chung</button><button id="btn-clear-offline" class="danger">Xóa offline</button></div>
+</div>
+<div id="log"></div>
+</div>
+<script>
+const LS_CONTACTS='golf279_contacts_v2';const LS_GROUPS='golf279_groups_v2';const LS_SHARED='golf279_shared_contacts';
+let rows=[], messages=[], curIdx=0, sending=false, timer=null, selectedIds=new Set(), currentFilterGroup='all';
+function boDauTV(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D');}
+function log(m){const el=document.getElementById('log'); el.textContent+='\n'+new Date().toLocaleTimeString()+': '+m; el.scrollTop=el.scrollHeight;}
+function insertTag(t){const ta=document.getElementById('template'); const s=ta.selectionStart; ta.value=ta.value.slice(0,s)+t+ta.value.slice(ta.selectionEnd); ta.focus();}
+function cleanPhone(p){let s=(p||'').toString().trim().replace(/\s+/g,'').replace(/[\.\-\(\)]/g,''); if(s.startsWith('+84')) s='0'+s.slice(3); else if(s.startsWith('84')&&s.length>=11) s='0'+s.slice(2); s=s.replace(/[^0-9]/g,''); if(s.length===9) s='0'+s; return s;}
+function getInitial(n){return (n||'?').trim().charAt(0).toUpperCase();}
+function isValidGroupName(name){if(!name) return false; const t=name.trim(); if(t.length<2) return false; if(t.length>30) return false; if(/^\d+(\.\d+)?$/.test(t)) return false; if(/^0\d{9,10}$/.test(t)) return false; if(/^\d{2,3}$/.test(t)) return false; return true;}
+function normalizeGroup(name){if(!name) return 'Chung'; const t=name.trim(); if(!isValidGroupName(t)) return 'Chung'; return t;}
+function getGroups(){try{return JSON.parse(localStorage.getItem(LS_GROUPS)||'["Chung","VIP","Dalat2026"]');}catch{return ["Chung","VIP","Dalat2026"];}}
+function saveGroups(g){const clean=[...new Set(g.filter(isValidGroupName))]; if(!clean.includes('Chung')) clean.unshift('Chung'); localStorage.setItem(LS_GROUPS,JSON.stringify(clean)); updateCounts();}
+function getContacts(){try{return JSON.parse(localStorage.getItem(LS_CONTACTS)||'[]');}catch{return [];}}
+function saveContacts(c){localStorage.setItem(LS_CONTACTS,JSON.stringify(c)); updateCounts();}
+function getShared(){try{return JSON.parse(localStorage.getItem(LS_SHARED)||'[]');}catch{return [];}}
+function saveShared(c){localStorage.setItem(LS_SHARED,JSON.stringify(c)); updateCounts();}
+function getAllContacts(){const offline=getContacts(); const shared=getShared(); const map=new Map(); offline.forEach(x=>map.set(x.sdt,{...x,isShared:false})); shared.forEach(x=>map.set(x.sdt,{...x,isShared:true})); return Array.from(map.values());}
+function updateCounts(){const all=getAllContacts(); const shared=getShared(); document.getElementById('count-total').textContent=all.length; document.getElementById('count-shared').textContent=shared.length; document.getElementById('count-group').textContent=getGroups().length; document.getElementById('count-vga').textContent=all.filter(x=>x.vga).length; renderGroupOptions(); renderPhonebook(); renderGroupManage();}
+function renderGroupOptions(){const groups=getGroups(); const opts='<option value="">-- Gán nhóm --</option>'+groups.map(g=>`<option value="${g}">${g}</option>`).join(''); const optsAll='<option value="all">Tất cả nhóm</option>'+groups.map(g=>`<option value="${g}">${g}</option>`).join(''); document.getElementById('groupAssign').innerHTML=opts; document.getElementById('filterGroup').innerHTML=optsAll; document.getElementById('filterContactGroup').innerHTML=optsAll; document.getElementById('groupChips').innerHTML='<div class="chip '+(currentFilterGroup==='all'?'active':'')+'" data-g="all">Tất cả</div>'+groups.map(g=>`<div class="chip ${currentFilterGroup===g?'active':''}" data-g="${g}">${g}</div>`).join(''); document.querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{currentFilterGroup=ch.dataset.g; document.getElementById('filterContactGroup').value=currentFilterGroup; renderGroupOptions(); renderPhonebook();});}
+function renderGroupManage(){const groups=getGroups(); const all=getAllContacts(); document.getElementById('groupList').innerHTML=groups.map(g=>{const count=all.filter(x=>x.nhom===g).length; return `<div class="group-item"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" class="grp-chk" value="${g}"> <b>${g}</b> (${count})</label><span><button class="small secondary" onclick="renameGroup('${g.replace(/'/g,"\\'")}')">Sửa</button> <button class="small danger" onclick="deleteGroup('${g.replace(/'/g,"\\'")}')">Xóa</button></span></div>`;}).join('');}
+window.createGroup=()=>{const name=document.getElementById('newGroupName').value.trim(); if(!name) return alert('Nhập tên nhóm'); if(!isValidGroupName(name)) return alert('Tên nhóm không hợp lệ (không được là số thuần túy như 12, 15)'); let groups=getGroups(); if(groups.includes(name)) return alert('Đã tồn tại'); groups.push(name); saveGroups(groups); document.getElementById('newGroupName').value=''; log('Tạo nhóm '+name);};
+window.renameGroup=(oldName)=>{const newName=prompt(`Đổi tên nhóm "${oldName}" thành:`, oldName); if(!newName||newName===oldName) return; if(!isValidGroupName(newName)) return alert('Tên nhóm mới không hợp lệ'); let groups=getGroups(); if(groups.includes(newName)) return alert('Đã tồn tại'); groups=groups.map(g=>g===oldName?newName:g); saveGroups(groups); let offline=getContacts().map(c=>c.nhom===oldName?{...c,nhom:newName}:c); let shared=getShared().map(c=>c.nhom===oldName?{...c,nhom:newName}:c); localStorage.setItem(LS_CONTACTS,JSON.stringify(offline)); localStorage.setItem(LS_SHARED,JSON.stringify(shared)); log(`Đổi ${oldName} -> ${newName}`); updateCounts();};
+window.deleteGroup=(name)=>{if(name==='Chung') return alert('Không xóa nhóm Chung'); if(!confirm(`Xóa nhóm "${name}"? ${getAllContacts().filter(x=>x.nhom===name).length} liên hệ sẽ về Chung`)) return; let groups=getGroups().filter(g=>g!==name); saveGroups(groups); let offline=getContacts().map(c=>c.nhom===name?{...c,nhom:'Chung'}:c); let shared=getShared().map(c=>c.nhom===name?{...c,nhom:'Chung'}:c); localStorage.setItem(LS_CONTACTS,JSON.stringify(offline)); localStorage.setItem(LS_SHARED,JSON.stringify(shared)); if(currentFilterGroup===name) currentFilterGroup='all'; updateCounts();};
+function renderPhonebook(){const search=(document.getElementById('searchContact')?.value||'').toLowerCase(); const filterGroup=document.getElementById('filterContactGroup')?.value||'all'; const filterSource=document.getElementById('filterContactSource')?.value||'all'; let list=getAllContacts(); if(filterSource==='shared') list=list.filter(x=>x.isShared); else if(filterSource==='offline') list=list.filter(x=>!x.isShared); if(filterGroup!=='all') list=list.filter(x=>x.nhom===filterGroup); if(currentFilterGroup!=='all') list=list.filter(x=>x.nhom===currentFilterGroup); if(search) list=list.filter(x=> (x.ten||'').toLowerCase().includes(search) || (x.sdt||'').includes(search) || (x.vga||'').toLowerCase().includes(search) || (x.nhom||'').toLowerCase().includes(search)); list.sort((a,b)=>a.ten.localeCompare(b.ten)); document.getElementById('contactList').innerHTML=list.map(c=>`<div class="contact-card"><div class="avatar">${getInitial(c.ten)}</div><div class="c-info"><div class="c-name">${c.ten}</div><div class="c-phone">${c.sdt}</div><div class="c-badges"><span class="c-badge">${c.nhom||'Chung'}</span>${c.vga?`<span class="c-badge c-vga">VGA:${c.vga}</span>`:''}</div></div><div class="c-actions"><button class="small" onclick="quickSend('${c.sdt}')" style="background:var(--accent)">📤</button><button class="small secondary" onclick="editContact('${c.sdt}')">✏️</button><button class="small danger" onclick="deleteContact('${c.sdt}')">🗑</button></div></div>`).join('') || '<div class="hint">Chưa có danh bạ</div>'; document.getElementById('contactCountHint').textContent=`Hiển thị ${list.length}/${getAllContacts().length} - search VGA local`;}
+window.quickSend=(sdt)=>{document.querySelector('[data-tab="send"]').click(); const contact=getAllContacts().find(x=>x.sdt===sdt); if(!contact) return; let tpl=document.getElementById('template').value; const autoBoDau=document.getElementById('boDau').checked; let msg=tpl.replaceAll('{ten}',contact.ten).replaceAll('{sdt}',contact.sdt).replaceAll('{nhom}',contact.nhom||'').replaceAll('{vga}',contact.vga||''); if(autoBoDau) msg=boDauTV(msg); messages=[{...contact,message:msg,id:contact.sdt}]; curIdx=0; selectedIds=new Set([contact.sdt]); document.getElementById('preview').innerHTML=`<table><tr><th>Tên</th><th>SĐT</th><th>VGA</th><th>Nội dung</th><th>Gửi</th></tr><tr><td>${contact.ten}</td><td>${contact.sdt}</td><td>${contact.vga||''}</td><td>${msg}</td><td><button onclick="sendOne(0)" style="padding:6px;background:var(--accent)">GỬI</button></td></tr></table>`; sendOne(0);};
+window.deleteContact=(sdt)=>{if(!confirm('Xóa '+sdt+'?')) return; saveContacts(getContacts().filter(x=>x.sdt!==sdt)); saveShared(getShared().filter(x=>x.sdt!==sdt));};
+window.editContact=(oldSdt)=>{const c=getAllContacts().find(x=>x.sdt===oldSdt); if(!c) return; const newName=prompt('Tên:',c.ten); if(newName===null) return; const newSdtRaw=prompt('SĐT:',c.sdt); if(newSdtRaw===null) return; const newSdt=cleanPhone(newSdtRaw); if(!/^0\d{9,10}$/.test(newSdt)){alert('SĐT lỗi');return;} const groups=getGroups(); const newGroup=prompt(`Nhóm (hiện có: ${groups.join(', ')}):`,c.nhom||'Chung'); if(newGroup===null) return; const normGroup=normalizeGroup(newGroup); const newVga=prompt('VGA:',c.vga||''); if(newVga===null) return; const newSource=prompt('Nguồn: chung/offline',c.isShared?'chung':'offline'); if(newSource===null) return; const isChung=newSource.toLowerCase().includes('chung'); let offline=getContacts().filter(x=>x.sdt!==oldSdt); let shared=getShared().filter(x=>x.sdt!==oldSdt); if(offline.find(x=>x.sdt===newSdt)||shared.find(x=>x.sdt===newSdt)){if(!confirm('Trùng SĐT, ghi đè?')) return; offline=offline.filter(x=>x.sdt!==newSdt); shared=shared.filter(x=>x.sdt!==newSdt);} const newContact={ten:newName.trim(),sdt:newSdt,nhom:normGroup,vga:newVga.trim(),ten2:newName,ten3:newName}; if(isChung) shared.push({...newContact,isShared:true}); else offline.push(newContact); localStorage.setItem(LS_CONTACTS,JSON.stringify(offline)); localStorage.setItem(LS_SHARED,JSON.stringify(shared)); if(isValidGroupName(normGroup)){let gs=getGroups(); if(!gs.includes(normGroup)){gs.push(normGroup); saveGroups(gs);}} updateCounts();};
+async function loadSharedFromServer(){const banner=document.getElementById('sharedBanner'); try{const urls=['./contacts.json','contacts.json']; let data=null, usedUrl=''; for(const url of urls){try{const res=await fetch(url,{cache:'no-store'}); if(res.ok){data=await res.json(); usedUrl=url; break;}}catch{}} if(data){let contacts=[]; if(Array.isArray(data)) contacts=data; else if(data.shared) contacts=data.shared; contacts=contacts.map(c=>({ten:c.ten||'',sdt:cleanPhone(c.sdt||''),nhom:normalizeGroup(c.nhom||'Chung'),vga:(c.vga||'').toString().trim(),isShared:true})).filter(c=>c.ten&&/^0\d{9,10}$/.test(c.sdt)); if(contacts.length){saveShared(contacts); let groups=getGroups(); contacts.forEach(c=>{if(isValidGroupName(c.nhom)&&!groups.includes(c.nhom)) groups.push(c.nhom);}); saveGroups(groups); banner.style.display='block'; banner.className='banner ok'; banner.innerHTML=`✅ Chung từ ${usedUrl}: ${contacts.length} liên hệ`;}} }catch{} updateCounts();}
+loadSharedFromServer();
+document.getElementById('excel').addEventListener('change', async e=>{const file=e.target.files[0]; if(!file) return; const data=await file.arrayBuffer(); const wb=XLSX.read(data); const ws=wb.Sheets[wb.SheetNames[0]]; const json=XLSX.utils.sheet_to_json(ws,{header:1}); const raw=json.slice(1); rows=raw.map(r=>{let c1=(r[0]||'').toString().trim(); let c2=cleanPhone((r[1]||'').toString()); let c3=(r[2]||'').toString().trim(); let c4=(r[3]||'').toString().trim(); if(!c1||!c2||!/^0\d{9,10}$/.test(c2)) return null; let nhom=c3; let vga=c4; if(!isValidGroupName(nhom) && /^\d+(\.\d+)?$/.test(nhom) && !vga){vga=nhom; nhom=document.getElementById('groupAssign').value||'Chung';}else{nhom=normalizeGroup(nhom||document.getElementById('groupAssign').value||'Chung');} return {ten:c1,sdt:c2,nhom:nhom,vga:vga||''};}).filter(Boolean); document.getElementById('adminPreview').textContent=`Đọc ${rows.length} - Nhóm hợp lệ: ${[...new Set(rows.map(r=>r.nhom))].join(', ')} - Có VGA: ${rows.filter(x=>x.vga).length}`; log(`Đọc ${rows.length}`);});
+document.getElementById('btn-save-offline').onclick=()=>{if(!rows.length) return alert('Nạp Excel'); let contacts=getContacts(); rows.forEach(r=>{if(!contacts.find(x=>x.sdt===r.sdt)) contacts.push(r);}); saveContacts(contacts);};
+document.getElementById('btn-save-shared').onclick=()=>{if(!rows.length) return alert('Nạp Excel'); let shared=getShared(); rows.forEach(r=>{const idx=shared.findIndex(x=>x.sdt===r.sdt); if(idx<0) shared.push({...r,isShared:true}); else shared[idx]={...shared[idx],...r,isShared:true};}); saveShared(shared); let groups=getGroups(); rows.forEach(r=>{if(isValidGroupName(r.nhom)&&!groups.includes(r.nhom)) groups.push(r.nhom);}); saveGroups(groups);};
+document.getElementById('btn-export-contacts-json').onclick=()=>{const shared=getShared(); if(!shared.length) return alert('Trống'); const blob=new Blob([JSON.stringify(shared,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='contacts.json'; a.click();};
+document.getElementById('btn-export-backup').onclick=()=>{const data={contacts:getContacts(),shared:getShared(),groups:getGroups()}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup.json'; a.click();};
+document.getElementById('importJson').addEventListener('change', async e=>{const file=e.target.files[0]; if(!file) return; const txt=await file.text(); const data=JSON.parse(txt); if(Array.isArray(data)) saveShared(data); else {if(data.contacts) saveContacts(data.contacts); if(data.shared) saveShared(data.shared); if(data.groups) saveGroups(data.groups);} log('Nhập xong');});
+document.getElementById('btn-import-json').onclick=()=>document.getElementById('importJson').click();
+document.getElementById('btn-clear-shared').onclick=()=>{if(confirm('Xóa chung?')){localStorage.removeItem(LS_SHARED); updateCounts();}};
+document.getElementById('btn-clear-offline').onclick=()=>{if(confirm('Xóa offline?')){localStorage.removeItem(LS_CONTACTS); updateCounts();}};
+document.getElementById('btn-clean-groups').onclick=()=>{let groups=getGroups(); const before=groups.length; groups=groups.filter(isValidGroupName); if(groups.length===0) groups=['Chung']; saveGroups(groups); log(`Dọn rác: ${before} -> ${groups.length} nhóm`);};
+document.getElementById('btn-delete-selected-groups').onclick=()=>{const checked=[...document.querySelectorAll('.grp-chk:checked')].map(c=>c.value); if(!checked.length) return alert('Chưa chọn nhóm'); if(checked.includes('Chung')) return alert('Không xóa nhóm Chung'); if(!confirm(`Xóa ${checked.length} nhóm: ${checked.join(', ')}? Liên hệ sẽ về Chung`)) return; let groups=getGroups().filter(g=>!checked.includes(g)); saveGroups(groups); let offline=getContacts().map(c=>checked.includes(c.nhom)?{...c,nhom:'Chung'}:c); let shared=getShared().map(c=>checked.includes(c.nhom)?{...c,nhom:'Chung'}:c); localStorage.setItem(LS_CONTACTS,JSON.stringify(offline)); localStorage.setItem(LS_SHARED,JSON.stringify(shared)); if(checked.includes(currentFilterGroup)) currentFilterGroup='all'; updateCounts();};
+document.getElementById('btn-reset-groups').onclick=()=>{if(!confirm('Reset về Chung,VIP,Dalat2026?')) return; saveGroups(['Chung','VIP','Dalat2026']);};
+document.getElementById('searchContact').addEventListener('input', renderPhonebook);
+document.getElementById('filterContactGroup').addEventListener('change', renderPhonebook);
+document.getElementById('filterContactSource').addEventListener('change', renderPhonebook);
+document.getElementById('btn-preview').onclick=()=>{let source=[]; const fg=document.getElementById('filterGroup').value; const fs=document.getElementById('filterSource').value; if(fs==='offline') source=getContacts(); else if(fs==='shared') source=getShared(); else source=getAllContacts(); if(fg!=='all') source=source.filter(x=>x.nhom===fg); if(!source.length) return alert('Trống'); let tpl=document.getElementById('template').value; const bo=document.getElementById('boDau').checked; messages=source.map(r=>{let msg=tpl.replaceAll('{ten}',r.ten).replaceAll('{sdt}',r.sdt).replaceAll('{nhom}',r.nhom||'').replaceAll('{vga}',r.vga||''); if(bo) msg=boDauTV(msg); return {...r,message:msg,id:r.sdt};}); curIdx=0; selectedIds=new Set(messages.map(m=>m.id)); document.getElementById('preview').innerHTML='<table><tr><th><input type="checkbox" id="chkAll" checked></th><th>Tên</th><th>SĐT</th><th>VGA</th><th>Nhóm</th><th>Nội dung</th><th>Gửi</th></tr>'+messages.map((m,i)=>`<tr id="row-${i}"><td><input type="checkbox" class="chk" data-id="${m.id}" checked></td><td>${m.ten}</td><td>${m.sdt}</td><td>${m.vga||''}</td><td>${m.nhom}</td><td>${m.message}</td><td><button onclick="sendOne(${i})" class="small" style="background:var(--accent)">GỬI</button></td></tr>`).join('')+'</table>'; document.getElementById('chkAll').addEventListener('change', e=>{document.querySelectorAll('.chk').forEach(ch=>{ch.checked=e.target.checked; if(e.target.checked) selectedIds.add(ch.dataset.id); else selectedIds.delete(ch.dataset.id);});}); document.querySelectorAll('.chk').forEach(ch=>{ch.addEventListener('change', e=>{if(e.target.checked) selectedIds.add(e.target.dataset.id); else selectedIds.delete(e.target.dataset.id);});}); document.getElementById('btn-next').disabled=false;};
+document.getElementById('btn-select-all').onclick=()=>{const all=document.getElementById('chkAll'); if(all){all.checked=!all.checked; all.dispatchEvent(new Event('change'));}};
+function getSimChoice(){return document.querySelector('input[name="sim"]:checked')?.value||'auto';}
+function buildSmsUri(phone, body, sim){const clean=cleanPhone(phone); const enc=encodeURIComponent(body); if(sim==='0') return `intent://${clean}#Intent;scheme=smsto;S.sms_body=${enc};S.simSlot=0;i.simSlot=0;end`; if(sim==='1') return `intent://${clean}#Intent;scheme=smsto;S.sms_body=${enc};S.simSlot=1;i.simSlot=1;end`; return `smsto:${clean}?body=${enc}`;}
+function sendOne(idx){if(idx<0||idx>=messages.length) return false; const m=messages[idx]; if(!selectedIds.has(m.id)) return false; const uri=buildSmsUri(m.sdt,m.message,getSimChoice()); log(`→ ${m.ten}`); document.querySelectorAll('#preview tr').forEach(tr=>tr.style.background=''); const row=document.getElementById(`row-${idx}`); if(row) row.style.background='var(--accent-bg)'; window.location.href=uri; curIdx=idx+1; return true;}
+window.sendOne=sendOne;
+document.getElementById('btn-send').onclick=async()=>{if(!messages.length) return alert('Lọc trước'); if(sending) return; sending=true; curIdx=0; while(sending&&curIdx<messages.length){const ok=sendOne(curIdx); const delay=document.getElementById('delayCheck').checked?5000:2000; if(ok) await new Promise(r=>{timer=setTimeout(r,delay);}); else curIdx++;} sending=false;};
+document.getElementById('btn-next').onclick=()=>{if(curIdx>=messages.length) return; sendOne(curIdx);};
+document.getElementById('btn-stop').onclick=()=>{sending=false; if(timer) clearTimeout(timer);};
+document.querySelectorAll('.tabs button').forEach(btn=>{btn.onclick=()=>{document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.getElementById('tab-contacts').style.display=btn.dataset.tab==='contacts'?'':'none'; document.getElementById('tab-send').style.display=btn.dataset.tab==='send'?'':'none'; document.getElementById('tab-admin').style.display=btn.dataset.tab==='admin'?'':'none'; if(btn.dataset.tab==='contacts') renderPhonebook();};});
+updateCounts();
+</script>
+</body>
+</html>
