@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SMS PRO v7 FIX - DANH BẠ CHUẨN</title>
+<title>LEHA SMS PRO v7</title>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -47,9 +47,9 @@ table{width:100%;border-collapse:collapse}th,td{border:1px solid var(--border);p
 <div class="stat"><b id="count-vga">0</b>VGA</div>
 </div>
 <div class="tabs">
-<button class="active" data-tab="contacts">📒 DANH BẠ</button>
-<button data-tab="send">📤 GỬI</button>
-<button data-tab="admin">⚙️ ADMIN</button>
+<button class="active" data-tab="contacts">DANH BẠ</button>
+<button data-tab="send">GỬI</button>
+<button data-tab="admin">ADMIN</button>
 </div>
 <div id="tab-contacts">
 <div class="phonebook-search">
@@ -75,13 +75,13 @@ table{width:100%;border-collapse:collapse}th,td{border:1px solid var(--border);p
 <div id="tab-admin" style="display:none">
 <div class="banner info">Logic mới: A=Tên, B=SĐT, C=Nhóm, D=VGA. Nhóm rác (số) tự loại. Có nút dọn rác và xóa hàng loạt nhóm.</div>
 <div class="row"><input type="file" id="excel" accept=".xlsx,.xls,.csv" style="flex:2"><select id="groupAssign" style="flex:1"><option value="">-- Gán nhóm --</option></select></div>
-<div class="row"><button id="btn-save-offline" class="secondary">💾 Lưu offline</button><button id="btn-save-shared" style="background:#f59e0b;color:#000">📌 Thêm chung</button></div>
+<div class="row"><button id="btn-save-offline" class="secondary">Lưu offline</button><button id="btn-save-shared" style="background:#f59e0b;color:#000">Thêm chung</button></div>
 <div id="adminPreview" class="hint"></div>
 <div class="group-manage">
-<b>📁 Quản lý nhóm (logic danh bạ chuẩn)</b>
+<b>Quản lý nhóm (logic danh bạ chuẩn)</b>
 <div class="hint">Chỉ hiện nhóm hợp lệ (chữ, không phải số VGA). Có chọn hàng loạt để xóa.</div>
 <div class="row"><input id="newGroupName" placeholder="Tên nhóm mới"><button id="btn-create-group" style="flex:0.5">+ Tạo</button></div>
-<div class="row"><button id="btn-clean-groups" class="secondary">🧹 Dọn nhóm rác (số, trống)</button><button id="btn-delete-selected-groups" class="danger">🗑 Xóa nhóm đã chọn</button><button id="btn-reset-groups" class="secondary">♻️ Reset về mặc định</button></div>
+<div class="row"><button id="btn-clean-groups" class="secondary">Dọn nhóm rác (số, trống)</button><button id="btn-delete-selected-groups" class="danger">🗑 Xóa nhóm đã chọn</button><button id="btn-reset-groups" class="secondary">Reset về mặc định</button></div>
 <div id="groupList"></div>
 </div>
 <div class="row"><button id="btn-export-contacts-json" class="secondary">📤 Xuất contacts.json</button><button id="btn-export-backup" class="secondary">📤 Backup</button></div>
