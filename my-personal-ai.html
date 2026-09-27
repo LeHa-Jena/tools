@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Cá Nhân - Có Up File</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,sans-serif;background:#0a0a0a;color:#e5e5e5;display:flex;height:100vh;overflow:hidden}
+.sidebar{width:280px;background:#171717;border-right:1px solid #262626;display:flex;flex-direction:column;padding:12px;overflow:auto}
+.proj{padding:10px 12px;border-radius:8px;cursor:pointer;margin-bottom:4px;font-size:14px}
+.proj.active{background:#262626;color:#fff}
+.main{flex:1;display:flex;flex-direction:column}
+.header{padding:14px 20px;border-bottom:1px solid #262626;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.chat{flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.msg{max-width:85%;padding:12px 14px;border-radius:12px;font-size:14px;line-height:1.6;white-space:pre-wrap}
+.user{align-self:flex-end;background:#fff;color:#000}
+.bot{align-self:flex-start;background:#262626}
+.inputbar{display:flex;padding:12px;border-top:1px solid #262626;gap:8px;align-items:center;flex-wrap:wrap}
+.inputbar input[type=text]{flex:1;background:#171717;border:1px solid #333;border-radius:20px;padding:10px 16px;color:#fff;outline:none;min-width:180px}
+.inputbar button{background:#fff;color:#000;border:none;border-radius:20px;padding:10px 18px;font-weight:600;cursor:pointer}
+.preview{font-size:12px;color:#aaa;margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+.pill{background:#262626;border:1px solid #333;padding:4px 8px;border-radius:12px;display:flex;align-items:center;gap:6px}
+.pill img{width:24px;height:24px;object-fit:cover;border-radius:4px}
+textarea{width:100%;background:#111;border:1px solid #333;border-radius:8px;padding:10px;color:#fff;min-height:70px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <b style="margin:8px">MY PROJECTS</b>
+  <div id="projList"></div>
+  <button onclick="addProject()" style="margin:12px 0;background:#262626;border:1px solid #333;color:#aaa;padding:8px;border-radius:8px;cursor:pointer">+ Thêm Project</button>
+  <div style="border-top:1px solid #262626;padding-top:12px">
+    <div style="font-size:11px;color:#666">SYSTEM PROMPT (ép nói ngắn)</div>
+    <textarea id="sysPrompt"></textarea>
+    <div style="font-size:11px;color:#666;margin-top:8px">GEMINI API KEY (Pro Work)</div>
+    <input id="apiKey" type="password" placeholder="AIza..." style="width:100%;background:#111;border:1px solid #333;border-radius:8px;padding:8px;color:#fff;margin-top:4px">
+    <button onclick="saveSettings()" style="width:100%;margin-top:8px;background:#fff;color:#000;border:none;padding:8px;border-radius:8px;font-weight:600">Lưu</button>
+    <div style="font-size:11px;color:#555;margin-top:10px;line-height:1.4">
+      ✔ Up được: Ảnh (jpg/png), PDF, TXT, MD, DOCX (đọc text)<br>
+      ✔ Ảnh gửi thẳng cho Gemini nó nhìn<br>
+      ✔ Tài liệu text sẽ dán vào Notebook tự động
+    </div>
+  </div>
+</div>
+<div class="main">
+  <div class="header">
+    <div><b id="projName"></b> <span style="color:#666;font-size:12px">• Up tài liệu & hình</span></div>
+    <label style="background:#262626;border:1px solid #333;padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer">📎 Up file<input type="file" id="fileInput" multiple accept="image/*,.pdf,.txt,.md,.csv,.docx" style="display:none"></label>
+  </div>
+  <div class="chat" id="chat"></div>
+  <div class="preview" id="preview"></div>
+  <div class="inputbar">
+    <input id="msgInput" type="text" placeholder="Nhắn hoặc hỏi về file vừa up..." onkeydown="if(event.key==='Enter') send()">
+    <button onclick="send()">Gửi</button>
+  </div>
+</div>
+<script>
+const defaultProjects = [{id:'clb-golf',name:'CLB Golf Của Sếp',notes:'VIP: Dũng Hòa Bình, Minh Thép.'},{id:'to-chuc-giai',name:'Tổ Chức Giải',notes:''}];
+let projects = JSON.parse(localStorage.getItem('myProjectsV2')||'null')||defaultProjects;
+let currentId = localStorage.getItem('currentProjV2')||projects[0].id;
+let sysPrompt = localStorage.getItem('sysPromptV2')||`Bạn là trợ lý cá nhân. Luật: Trả lời tối đa 5 câu, ngắn gọn, đi thẳng vào việc. Không nói dài dòng. Dùng ghi chú và file đã up để trả lời.`;
+let apiKey = localStorage.getItem('geminiKeyV2')||'';
+let pendingFiles = []; // {name,type,base64,text}
+document.getElementById('sysPrompt').value=sysPrompt;
+document.getElementById('apiKey').value=apiKey;
+
+function renderProjects(){
+  const list=document.getElementById('projList');list.innerHTML='';
+  projects.forEach(p=>{
+    const d=document.createElement('div');d.className='proj'+(p.id===currentId?' active':'');d.innerText=p.name;
+    d.onclick=()=>{currentId=p.id;localStorage.setItem('currentProjV2',p.id);renderAll()};list.appendChild(d);
+  });
+  document.getElementById('projName').innerText=projects.find(x=>x.id===currentId).name;
+}
+function getHist(){return JSON.parse(localStorage.getItem('hist_'+currentId)||'[]')}
+function saveHist(h){localStorage.setItem('hist_'+currentId,JSON.stringify(h))}
+function renderAll(){renderProjects();renderChat()}
+function renderChat(){
+  const cur=projects.find(x=>x.id===currentId);
+  const chat=document.getElementById('chat');chat.innerHTML='';
+  const noteDiv=document.createElement('div');
+  noteDiv.style.cssText='background:#171717;border:1px dashed #333;padding:12px;border-radius:8px;margin-bottom:12px';
+  noteDiv.innerHTML=`<b>Notebook (sẽ thành notes.md trên Github):</b><textarea id="noteEdit" onblur="saveNote()">${cur.notes||''}</textarea>`;
+  chat.appendChild(noteDiv);
+  getHist().forEach(m=>{
+    const d=document.createElement('div');d.className='msg '+(m.role==='user'?'user':'bot');
+    let t=m.text; if(m.files&&m.files.length){ t+='\n\n📎 Đã đính kèm: '+m.files.map(f=>f.name).join(', ') }
+    d.innerText=t; chat.appendChild(d);
+  });
+  chat.scrollTop=chat.scrollHeight;
+}
+function saveNote(){const cur=projects.find(x=>x.id===currentId);cur.notes=document.getElementById('noteEdit').value;localStorage.setItem('myProjectsV2',JSON.stringify(projects))}
+function saveSettings(){sysPrompt=document.getElementById('sysPrompt').value;apiKey=document.getElementById('apiKey').value;localStorage.setItem('sysPromptV2',sysPrompt);localStorage.setItem('geminiKeyV2',apiKey);alert('Đã lưu!')}
+
+document.getElementById('fileInput').addEventListener('change', async (e)=>{
+  const files = Array.from(e.target.files);
+  for(let f of files){
+    if(f.type.startsWith('image/')){
+      const b64 = await toBase64(f);
+      pendingFiles.push({name:f.name,type:'image',base64:b64.split(',')[1], mime:f.type});
+    }else{
+      const text = await f.text();
+      pendingFiles.push({name:f.name,type:'text',text:text.slice(0,20000)}); // limit 20k chars
+      // auto append to notes
+      const cur=projects.find(x=>x.id===currentId);
+      cur.notes += `\n\n--- File: ${f.name} ---\n${text.slice(0,5000)}\n`;
+      localStorage.setItem('myProjectsV2',JSON.stringify(projects));
+    }
+  }
+  renderPreview(); renderAll();
+});
+function toBase64(file){return new Promise(r=>{const reader=new FileReader();reader.onload=()=>r(reader.result);reader.readAsDataURL(file)})}
+function renderPreview(){
+  const p=document.getElementById('preview');p.innerHTML='';
+  pendingFiles.forEach((f,i)=>{
+    const div=document.createElement('div');div.className='pill';
+    div.innerHTML = f.type==='image'?`<img src="data:${f.mime};base64,${f.base64}"> ${f.name}`:`📄 ${f.name} (${Math.round(f.text.length/1000)}k chữ)`;
+    const x=document.createElement('span');x.innerText=' x';x.style.cursor='pointer';x.onclick=()=>{pendingFiles.splice(i,1);renderPreview()}
+    div.appendChild(x); p.appendChild(div);
+  });
+}
+async function send(){
+  const input=document.getElementById('msgInput');const text=input.value.trim();
+  if(!text && pendingFiles.length===0) return;
+  if(!apiKey){alert('Dán API Key trước đã b!');return}
+  const cur=projects.find(x=>x.id===currentId);
+  let hist=getHist();
+  hist.push({role:'user', text, files: pendingFiles.map(f=>({name:f.name}))});
+  saveHist(hist); input.value=''; renderAll();
+  const chat=document.getElementById('chat');const loading=document.createElement('div');loading.className='msg bot';loading.innerText='Đang đọc file và nghĩ...';chat.appendChild(loading);
+
+  // build parts for Gemini
+  let parts = [{text: `${sysPrompt}\n\nProject: ${cur.name}\nNotebook: ${cur.notes}\n\nCâu hỏi: ${text}\n\nNếu có file, hãy dùng nội dung file để trả lời. Trả lời ngắn gọn 5 câu.`}];
+  pendingFiles.forEach(f=>{
+    if(f.type==='image') parts.push({inline_data:{mime_type:f.mime, data:f.base64}});
+    else parts.push({text:`\n\n--- NỘI DUNG FILE ${f.name} ---\n${f.text}\n--- HẾT FILE ---\n`});
+  });
+
+  try{
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({contents:[{parts}]})
+    });
+    const data = await res.json();
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Lỗi: '+JSON.stringify(data).slice(0,500);
+    hist.push({role:'bot', text: reply}); saveHist(hist);
+    pendingFiles=[]; renderPreview(); renderAll();
+  }catch(e){loading.innerText='Lỗi: '+e.message}
+}
+function addProject(){const name=prompt('Tên Project:');if(!name)return;const id=name.toLowerCase().replace(/\s+/g,'-')+'-'+Date.now();projects.push({id,name,notes:''});localStorage.setItem('myProjectsV2',JSON.stringify(projects));currentId=id;localStorage.setItem('currentProjV2',id);renderAll()}
+renderAll();
+</script>
+</body>
+</html>
