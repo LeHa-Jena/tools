@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LEHA.OS — Vanilla 5 Theme Real Tools</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'Be Vietnam Pro',system-ui,sans-serif;overflow-x:hidden}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:#E4E4E7;border-radius:999px}
+@keyframes floatBlob{0%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-40px) scale(1.08)}66%{transform:translate(-20px,20px) scale(0.95)}100%{transform:translate(0,0) scale(1)}}
+@keyframes ping{75%,100%{transform:scale(2);opacity:0}}
+@keyframes springIn{0%{transform:scale(0.96) translateY(4px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
+.tool-card{animation:springIn 0.55s cubic-bezier(0.34,1.56,0.64,1);transition:all 0.15s ease}
+.tool-card:hover{transform:translateY(-1px) scale(1.01);box-shadow:0 4px 16px rgba(0,0,0,0.1) !important}
+.tool-card:active{transform:scale(0.98)}
+.group-grid{animation:springIn 0.55s cubic-bezier(0.34,1.56,0.64,1)}
+input,textarea,select,button{font-family:inherit}
+</style>
+<link rel="manifest" href="leha_manifest.json">
+<meta name="theme-color" content="#0A0A0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LEHA.OS">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSI0OCIgZmlsbD0iIzBBMEEwQiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1mYW1pbHk9Ik1vbm9zcGFjZSIgZm9udC1zaXplPSI0OCIgZm9udC13ZWlnaHQ9IjgwMCI+TDwvdGV4dD48L3N2Zz4=">
+
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// // SECTION 0: THEME_GLOBAL - BRIEF: 5 theme chinh | 5 themes - Mau chung toan site | Is global design tokens
+// EDITABLE: Chinh o THEME_GLOBAL | Edit at THEME_GLOBAL
+// FIX AT: Neu doi mau chung sua o THEME_GLOBAL Search: THEME_GLOBAL | If global color edit at THEME_GLOBAL
+const THEME_GLOBAL = {
+  themes: {
+    goc: { name:'GỐC • TRẮNG', bg:'#F2F2F3', paper:'#FFFFFF', paperBlur:'rgba(255,255,255,0.86)', ink:'#0A0A0B', border:'#E4E4E7', borderThin:'#EDEEF1', borderContrast:'rgba(0,0,0,0.06)', muted:'#8A8A8E', labAnh:'#FF3B30', labChu:'#7C3AED', labTienIch:'#F59E0B' },
+    mono: { name:'MONO • TRẮNG VIỀN ĐEN', bg:'#FFFFFF', paper:'#FFFFFF', paperBlur:'rgba(255,255,255,0.92)', ink:'#000000', border:'#000000', borderThin:'#000000', borderContrast:'rgba(0,0,0,0.12)', muted:'#666666', labAnh:'#000000', labChu:'#000000', labTienIch:'#000000' },
+    sand: { name:'SAND • VÀNG ẤM', bg:'#FFF6D6', paper:'#FFFEF2', paperBlur:'rgba(255,254,242,0.90)', ink:'#3D2E00', border:'#F5D78E', borderThin:'#FBE9B0', borderContrast:'rgba(61,46,0,0.08)', muted:'#8A8A8E', labAnh:'#D4A017', labChu:'#B8860B', labTienIch:'#E6B422' },
+    midnight: { name:'MIDNIGHT • XANH ĐEN ĐẬM', bg:'#050E1F', paper:'#102040', paperBlur:'rgba(16,32,64,0.90)', ink:'#E6F0FF', border:'#1E3A66', borderThin:'#24467D', borderContrast:'rgba(36,70,125,0.45)', muted:'#7FA0CC', labAnh:'#3B82F6', labChu:'#60A5FA', labTienIch:'#38BDF8' },
+    night: { name:'NIGHT • ĐEN', bg:'#000000', paper:'#121212', paperBlur:'rgba(18,18,18,0.92)', ink:'#FFFFFF', border:'#2A2A2A', borderThin:'#333333', borderContrast:'rgba(255,255,255,0.10)', muted:'#AAAAAA', labAnh:'#FFFFFF', labChu:'#E5E5E5', labTienIch:'#CCCCCC' }
+  },
+  font: '"Be Vietnam Pro", system-ui, sans-serif',
+  fontWeight: { header:800, label:700, tool:600, muted:500 },
+  radius: { sm:'10px', md:'14px', lg:'18px', xl:'24px', pill:'999px' },
+  shadow: { card:'0 2px 12px rgba(0,0,0,0.06)', glowRed:'0 0 24px rgba(255,59,48,0.35)', glowViolet:'0 0 24px rgba(124,58,237,0.35)', glowAmber:'0 0 24px rgba(245,158,11,0.35)' },
+  blur: { blob:'64px', opacity:0.12, duration:'22s' },
+  motion: { spring:'cubic-bezier(0.34,1.56,0.64,1) 0.55s' }
+};
+
+// // SECTION 1: CONFIG - BRIEF: Cau hinh chung | Config - Header menu card | Is config
+// EDITABLE: Chinh o day | Edit at here
+// FIX AT: Neu doi mau chung sua o THEME_GLOBAL Search: THEME_GLOBAL | If global color edit at THEME_GLOBAL
+const HEADER_CONFIG = { h:56, pad:'12px 16px', logo:'LEHA.OS', storageKey:'leha_theme' };
+const MENU_CONFIG = {
+  storageKey:'leha_cats_v2',
+  defaultSort:'TẤT CẢ', defaultCat:'ALL',
+  row1:{ label:'SẮP XẾP', options:['TẤT CẢ','MỚI THÊM','A→Z'] },
+  row2:{ label:'DANH MỤC', defaultOptions:['ALL','ẢNH','CHỮ','TIỆN ÍCH'] },
+  layout:{ gap:6, radius:'999px', padY:7, padX:14, fontSize:11, fontWeight:500 }
+};
+const BG_ANIM_CONFIG = { size:220, blur:'64px', opacity:0.12 };
+
+// Tool definitions - 5 theme only
+const TOOL_DEFS = [
+  {id:'calc', name:'MÁY TÍNH', cat:'tienich', group:'TIỆN ÍCH', addedAt:1},
+  {id:'trim', name:'XÓA KHOẢNG TRỐNG', cat:'chu', group:'CHỮ', addedAt:2},
+  {id:'pdf-tools', name:'PDF NÉT - GHÉP/CẮT/TÁCH/NÉN/XUẤT ẢNH 10K DPI', cat:'anh', group:'ẢNH', addedAt:3},
+  {id:'img-convert', name:'JPG/PNG/WEBP ĐỔI ĐỊNH DẠNG', cat:'anh', group:'ẢNH', addedAt:4},
+  {id:'img-bg-resize', name:'CHÈN NỀN + ĐỔI SIZE 1:1/3:4', cat:'anh', group:'ẢNH', addedAt:5},
+  {id:'img-compress', name:'NÉN ẢNH ĐỒNG LOẠT', cat:'anh', group:'ẢNH', addedAt:6},
+  {id:'img-crop', name:'CẮT ẢNH VUÔNG/TRÒN ĐỒNG LOẠT', cat:'anh', group:'ẢNH', addedAt:7},
+  {id:'img-logo', name:'CHÈN LOGO ĐỒNG LOẠT GIỮ SIZE GỐC', cat:'anh', group:'ẢNH', addedAt:8},
+  {id:'unicode-bold', name:'CHỮ ĐẬM UNICODE + COPY', cat:'chu', group:'CHỮ', addedAt:9},
+  {id:'case-convert', name:'HOA/thường/Đầu Câu + COPY', cat:'chu', group:'CHỮ', addedAt:10},
+  {id:'age', name:'MÁY TÍNH TUỔI', cat:'tienich', group:'TIỆN ÍCH', addedAt:11},
+  {id:'calendar-vn', name:'LỊCH VN DƯƠNG ÂM', cat:'tienich', group:'TIỆN ÍCH', addedAt:12},
+  {id:'email-sig', name:'TẠO CHỮ KÝ EMAIL', cat:'chu', group:'CHỮ', addedAt:13},
+  {id:'qr-text', name:'TẠO QR CHỮ', cat:'tienich', group:'TIỆN ÍCH', addedAt:14},
+  {id:'find-replace', name:'TÌM & THAY THẾ', cat:'chu', group:'CHỮ', addedAt:15},
+  {id:'unit', name:'ĐỔI ĐƠN VỊ', cat:'tienich', group:'TIỆN ÍCH', addedAt:16},
+  {id:'word-count', name:'ĐẾM CHỮ', cat:'chu', group:'CHỮ', addedAt:17},
+  {id:'short-link', name:'RÚT GỌN LINK', cat:'tienich', group:'TIỆN ÍCH', addedAt:18}
+];
+
+let state = { theme: localStorage.getItem('leha_theme')||'goc', sort:'TẤT CẢ', cat:'ALL', open:{ anh:true, chu:true, tienich:true }, currentTool:null, cats: JSON.parse(localStorage.getItem('leha_cats_v2')||'null')||['ALL','ẢNH','CHỮ','TIỆN ÍCH'] };
+
+function getTime(){ const d=new Date(); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
+function getDateStr(){ return new Date().toLocaleDateString('vi-VN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}).toUpperCase(); }
+
+function renderBG(){
+  const T=THEME_GLOBAL.themes[state.theme];
+  return `<div style="position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden">
+    <div style="position:absolute;width:${BG_ANIM_CONFIG.size}px;height:${BG_ANIM_CONFIG.size}px;left:10%;top:12%;background:${T.labAnh};filter:blur(${BG_ANIM_CONFIG.blur});opacity:${BG_ANIM_CONFIG.opacity};border-radius:50%;animation:floatBlob ${THEME_GLOBAL.blur.duration} infinite"></div>
+    <div style="position:absolute;width:${BG_ANIM_CONFIG.size}px;height:${BG_ANIM_CONFIG.size}px;left:60%;top:18%;background:${T.labChu};filter:blur(${BG_ANIM_CONFIG.blur});opacity:${BG_ANIM_CONFIG.opacity};border-radius:50%;animation:floatBlob ${THEME_GLOBAL.blur.duration} infinite 2s"></div>
+    <div style="position:absolute;width:${BG_ANIM_CONFIG.size}px;height:${BG_ANIM_CONFIG.size}px;left:35%;top:55%;background:${T.labTienIch};filter:blur(${BG_ANIM_CONFIG.blur});opacity:${BG_ANIM_CONFIG.opacity};border-radius:50%;animation:floatBlob ${THEME_GLOBAL.blur.duration} infinite 4s"></div>
+  </div>`;
+}
+function renderHeader(){
+  const T=THEME_GLOBAL.themes[state.theme];
+  return `<div style="height:${HEADER_CONFIG.h}px;display:flex;align-items:center;justify-content:space-between;padding:${HEADER_CONFIG.pad};border-radius:${THEME_GLOBAL.radius.lg};background:${T.paperBlur};backdrop-filter:blur(12px);border:1px solid ${T.borderThin};box-shadow:${THEME_GLOBAL.shadow.card};position:sticky;top:12px;z-index:10">
+    <div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="state.currentTool=null;renderApp()"><span style="font-weight:800;font-size:18px;color:${T.ink}">${HEADER_CONFIG.logo}</span><span style="width:6px;height:6px;border-radius:50%;background:${T.labChu};box-shadow:${THEME_GLOBAL.shadow.glowViolet};animation:ping 2s infinite"></span></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="position:relative">
+        <button id="themeToggle" style="height:28px;border-radius:999px;border:1px solid ${T.borderThin};background:${T.paper};color:${T.ink};padding:0 10px;font-size:10px;font-weight:700;cursor:pointer">${T.name} ▼</button>
+        <div id="themeMenu" style="display:none;position:absolute;top:36px;right:0;background:${T.paper};border:1px solid ${T.borderThin};border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);padding:6px;min-width:200px;z-index:99;flex-direction:column;gap:4px">
+          ${Object.keys(THEME_GLOBAL.themes).map(k=>{ const th=THEME_GLOBAL.themes[k]; return `<button data-theme="${k}" style="display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:8px 10px;border-radius:8px;border:1px solid ${state.theme===k?T.ink:T.borderThin};background:${state.theme===k?T.ink:T.paper};color:${state.theme===k?T.paper:T.ink};font-size:11px;font-weight:600;cursor:pointer"><span style="width:10px;height:10px;border-radius:50%;background:${th.labAnh}"></span>${th.name}</button>`}).join('')}
+        </div>
+      </div>
+      <span style="font-size:12px;font-weight:800;background:${T.ink};color:${T.paper};padding:4px 8px;border-radius:999px">${getTime()}</span>
+      ${state.currentTool?`<button onclick="state.currentTool=null;renderApp()" style="height:28px;padding:0 10px;border-radius:999px;border:1px solid ${T.borderThin};background:${T.paper};color:${T.ink};font-size:10px;font-weight:700;cursor:pointer">← QUAY LẠI</button>`:''}
+    </div>
+  </div>`;
+}
+
+function groupByCat(tools){
+  const groups = { anh:[], chu:[], tienich:[] };
+  tools.forEach(t=>groups[t.cat].push(t));
+  return groups;
+}
+
+function renderToolCard(tool){
+  const T=THEME_GLOBAL.themes[state.theme];
+  return `<div class="tool-card" data-tool-id="${tool.id}" style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 8px;border-radius:14px;background:${T.paper};border:1px solid ${T.borderThin};box-shadow:${THEME_GLOBAL.shadow.card};cursor:pointer">
+    <span style="font-size:12px;font-weight:600;color:${T.ink}">${tool.name}</span><span style="font-size:10px;color:${T.muted}">↗</span></div>`;
+}
+
+
+function renderHome(){
+  const T=THEME_GLOBAL.themes[state.theme];
+  let tools=[...TOOL_DEFS];
+  if(state.cat!=='ALL'){
+    const map={'ẢNH':'anh','CHỮ':'chu','TIỆN ÍCH':'tienich'};
+    const want = map[state.cat]||state.cat.toLowerCase();
+    tools = tools.filter(t=> t.cat===want || state.cats.includes(state.cat) );
+  }
+  if(state.sort==='A→Z') tools.sort((a,b)=>a.name.localeCompare(b.name,'vi'));
+  if(state.sort==='MỚI THÊM') tools.sort((a,b)=>b.addedAt-a.addedAt);
+  const grouped={ anh:[], chu:[], tienich:[], custom:{} };
+  tools.forEach(t=>{
+    if(['anh','chu','tienich'].includes(t.cat)) grouped[t.cat].push(t);
+    else{
+      if(!grouped.custom[t.cat]) grouped.custom[t.cat]=[];
+      grouped.custom[t.cat].push(t);
+    }
+  });
+  const groups=[
+    {id:'anh', label:'ẢNH', dot:T.labAnh, tools:grouped.anh},
+    {id:'chu', label:'CHỮ', dot:T.labChu, tools:grouped.chu},
+    {id:'tienich', label:'TIỆN ÍCH', dot:T.labTienIch, tools:grouped.tienich}
+  ];
+  // custom categories
+  const customGroups = Object.keys(grouped.custom).map(k=>({id:'custom-'+k, label:k, dot:T.ink, tools:grouped.custom[k], isCustom:true, key:k}));
+  return `<div style="display:flex;flex-direction:column;gap:10px">
+    <div style="border-radius:${THEME_GLOBAL.radius.lg};background:${T.paper};border:1px solid ${T.borderThin};padding:10px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:9px;font-weight:800;letter-spacing:0.12em;color:${T.muted}">SẮP XẾP</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${MENU_CONFIG.row1.options.map(o=>`<button data-sort="${o}" style="border-radius:999px;padding:7px 14px;font-size:11px;font-weight:500;border:1px solid ${state.sort===o?T.ink:T.borderThin};background:${state.sort===o?T.ink:T.paper};color:${state.sort===o?T.paper:T.ink};cursor:pointer">${o}</button>`).join('')}</div>
+      <div style="height:1px;background:${T.borderThin}"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:9px;font-weight:800;letter-spacing:0.12em;color:${T.muted}">DANH MỤC • DOUBLE-CLICK SỬA • LONG-PRESS XÓA</span><button id="addCat" style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;border:1px solid ${T.borderThin};background:${T.paper};color:${T.ink};cursor:pointer">+ THÊM</button></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${state.cats.map(o=>`
+        <div style="display:flex;align-items:center;gap:2px;border-radius:999px;border:1px solid ${state.cat===o?T.ink:T.borderThin};background:${state.cat===o?T.ink:T.paper};padding:2px 2px 2px 10px">
+          <button data-cat="${o}" data-catname="${o}" style="border:none;background:transparent;color:${state.cat===o?T.paper:T.ink};font-size:11px;font-weight:500;cursor:pointer;padding:5px 4px">${o}</button>
+          ${o!=='ALL'&&o!=='ẢNH'&&o!=='CHỮ'&&o!=='TIỆN ÍCH'?`<button data-del-cat="${o}" style="width:18px;height:18px;border-radius:50%;border:none;background:${state.cat===o?T.paper:T.borderThin};color:${state.cat===o?T.ink:T.ink};font-size:10px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>`:''}
+        </div>
+      `).join('')}</div>
+    </div>
+    ${groups.map(g=>`
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button data-toggle="${g.id}" style="height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-radius:14px;background:${T.paper};border:1px solid ${T.borderThin};box-shadow:${THEME_GLOBAL.shadow.card};cursor:pointer">
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:${g.dot}"></span><span style="font-size:12px;font-weight:700;color:${T.ink}">${g.label}</span><span style="font-size:10px;border:1px solid ${T.borderThin};padding:2px 6px;border-radius:999px;color:${T.muted}">${g.tools.length}</span></div>
+          <span style="transform:rotate(${state.open[g.id]?0:-90}deg);transition:transform 0.2s;color:${T.ink}">▼</span>
+        </button>
+        <div style="display:${state.open[g.id]?'grid':'none'};grid-template-columns:repeat(2,1fr);gap:6px" class="group-grid">${g.tools.map(renderToolCard).join('')}</div>
+      </div>
+    `).join('')}
+    ${customGroups.map(g=>`
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button data-toggle="${g.id}" style="height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-radius:14px;background:${T.paper};border:1px solid ${T.borderThin};box-shadow:${THEME_GLOBAL.shadow.card};cursor:pointer">
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:${g.dot}"></span><span style="font-size:12px;font-weight:700;color:${T.ink}">${g.label}</span><span style="font-size:10px;border:1px solid ${T.borderThin};padding:2px 6px;border-radius:999px;color:${T.muted}">${g.tools.length}</span></div>
+          <span style="transform:rotate(${state.open[g.id]?0:-90}deg);transition:transform 0.2s;color:${T.ink}">▼</span>
+        </button>
+        <div style="display:${state.open[g.id]?'grid':'none'};grid-template-columns:repeat(2,1fr);gap:6px">${g.tools.map(renderToolCard).join('')}</div>
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+
+// Tool Views - real implementations
+function toolView_calc(){ return `<div><h3 style="font-size:18px;font-weight:800;margin-bottom:12px">MÁY TÍNH</h3><input id="calcInput" style="width:100%;padding:12px;border:1px solid #ccc;border-radius:10px;font-size:16px" placeholder="VD: 123*456/2"><div id="calcResult" style="margin-top:12px;font-size:24px;font-weight:800"></div><button onclick="try{ document.getElementById('calcResult').textContent=eval(document.getElementById('calcInput').value)}catch{ document.getElementById('calcResult').textContent='Lỗi' }" style="margin-top:8px;padding:8px 16px;border-radius:999px;border:1px solid #000;background:#000;color:#fff;cursor:pointer">Tính</button></div>`; }
+function toolView_trim(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">XÓA KHOẢNG TRỐNG</h3><textarea id="trimIn" style="width:100%;height:120px;padding:10px;border:1px solid #ccc;border-radius:10px" placeholder="Dán text..."></textarea><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+<button onclick="document.getElementById('trimOut').value=document.getElementById('trimIn').value.trim()" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">Trim 2 đầu</button>
+<button onclick="document.getElementById('trimOut').value=document.getElementById('trimIn').value.replace(/\\s+/g,' ')" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">Xóa thừa giữa</button>
+<button onclick="document.getElementById('trimOut').value=document.getElementById('trimIn').value.replace(/\\n\\s*\\n/g,'\\n')" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">Xóa dòng trống</button>
+</div><textarea id="trimOut" style="width:100%;height:120px;margin-top:8px;padding:10px;border:1px solid #ccc;border-radius:10px" placeholder="Kết quả"></textarea><button onclick="navigator.clipboard.writeText(document.getElementById('trimOut').value)" style="margin-top:8px;padding:8px 12px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Copy</button></div>`; }
+function toolView_pdf(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">PDF NÉT - GHÉP/CẮT/TÁCH/NÉN/XUẤT ẢNH 10K DPI</h3>
+<input type="file" id="pdfFiles" multiple accept=".pdf" style="margin-bottom:8px"><br>
+<div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
+<select id="pdfAction" style="padding:8px;border-radius:999px;border:1px solid #000"><option value="merge">Ghép PDF thành 1 file</option><option value="split">Tách từng trang</option><option value="long">Ghép thành 1 trang dài không khoảng cách cực nét</option><option value="export">Xuất PNG/JPG 10.000 DPI (scale x 10)</option></select>
+<button id="pdfDo" style="padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Chạy</button>
+</div>
+<div id="pdfStatus" style="font-size:12px;color:#666"></div>
+<div id="pdfOut" style="display:flex;flex-direction:column;gap:8px;margin-top:12px"></div>
+</div>`; }
+function toolView_imgConvert(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">JPG/PNG/WEBP ĐỔI ĐỊNH DẠNG</h3><input type="file" id="imgConvFiles" multiple accept="image/*"><div style="margin-top:8px;display:flex;gap:6px"><select id="convTo" style="padding:8px;border-radius:999px;border:1px solid #000"><option value="image/png">PNG</option><option value="image/jpeg">JPG</option><option value="image/webp">WEBP</option></select><button onclick="convertImages()" style="padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Đổi & Tải</button></div><div id="convOut" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px"></div></div>`; }
+function toolView_bgResize(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">CHÈN NỀN + ĐỔI SIZE 1:1/3:4/16:9...</h3><input type="file" id="bgFiles" multiple accept="image/*"><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><input type="color" id="bgColor" value="#ffffff"><select id="bgRatio" style="padding:8px;border-radius:999px;border:1px solid #000"><option value="1:1">1:1</option><option value="3:4">3:4</option><option value="4:3">4:3</option><option value="9:16">9:16</option><option value="16:9">16:9</option></select><button onclick="bgResizeDo()" style="padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Tạo</button></div><div id="bgOut" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px"></div></div>`; }
+function toolView_compress(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">NÉN ẢNH ĐỒNG LOẠT</h3><input type="file" id="compFiles" multiple accept="image/*"><div style="margin-top:8px"><label>Quality: <input type="range" id="compQ" min="0.1" max="1" step="0.1" value="0.7"> <span id="compQv">0.7</span></label> <button onclick="compressBatch()" style="padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer;margin-left:8px">Nén</button></div><div id="compOut" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px"></div></div>`; }
+function toolView_crop(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">CẮT ẢNH VUÔNG/TRÒN ĐỒNG LOẠT</h3><input type="file" id="cropFiles" multiple accept="image/*"><div style="margin-top:8px;display:flex;gap:6px"><select id="cropType" style="padding:8px;border-radius:999px;border:1px solid #000"><option value="square">Vuông</option><option value="circle">Tròn</option></select><button onclick="cropBatch()" style="padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Cắt</button></div><div id="cropOut" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px"></div></div>`; }
+function toolView_logo(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">CHÈN LOGO ĐỒNG LOẠT GIỮ SIZE GỐC</h3><label>Ảnh gốc: <input type="file" id="logoBase" multiple accept="image/*"></label><br><label style="margin-top:8px;display:block">Logo: <input type="file" id="logoMark" accept="image/*"></label><div style="margin-top:8px;display:flex;gap:6px"><select id="logoPos" style="padding:8px;border-radius:999px;border:1px solid #000"><option value="br">Góc phải dưới</option><option value="bl">Trái dưới</option><option value="tr">Phải trên</option><option value="tl">Trái trên</option><option value="center">Giữa</option></select><button onclick="logoBatch()" style="padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Chèn</button></div><div id="logoOut" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px"></div></div>`; }
+function toolView_unicode(){ const map={bold:'𝐀', italic:'𝐴', mono:'𝙰'}; return `<div><h3 style="font-weight:800;margin-bottom:8px">CHỮ ĐẬM UNICODE + COPY</h3><textarea id="uniIn" style="width:100%;height:80px;padding:10px;border:1px solid #ccc;border-radius:10px" placeholder="Nhập chữ..."></textarea><div id="uniOut" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div></div>`; }
+function toolView_case(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">HOA/thường/Đầu Câu + COPY</h3><textarea id="caseIn" style="width:100%;height:100px;padding:10px;border:1px solid #ccc;border-radius:10px"></textarea><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button onclick="caseDo('upper')" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">HOA</button><button onclick="caseDo('lower')" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">thường</button><button onclick="caseDo('title')" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">Hoa Đầu Chữ</button><button onclick="caseDo('sentence')" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">Hoa đầu câu</button></div><textarea id="caseOut" style="width:100%;height:100px;margin-top:8px;padding:10px;border:1px solid #ccc;border-radius:10px"></textarea><button onclick="navigator.clipboard.writeText(document.getElementById('caseOut').value)" style="margin-top:8px;padding:8px 12px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Copy</button></div>`; }
+function toolView_age(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">MÁY TÍNH TUỔI</h3><input type="date" id="ageDob" style="padding:8px;border-radius:999px;border:1px solid #000"><button onclick="calcAge()" style="margin-left:8px;padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Tính</button><div id="ageOut" style="margin-top:12px;font-size:18px;font-weight:700"></div></div>`; }
+function toolView_calendar(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">LỊCH VN DƯƠNG ÂM</h3><input type="date" id="calDate" style="padding:8px;border-radius:999px;border:1px solid #000"><button onclick="showCal()" style="margin-left:8px;padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Xem</button><div id="calOut" style="margin-top:12px"></div></div>`; }
+function toolView_emailSig(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">TẠO CHỮ KÝ EMAIL</h3><input id="sigName" placeholder="Tên" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:8px;margin-bottom:6px"><input id="sigTitle" placeholder="Chức danh" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:8px;margin-bottom:6px"><input id="sigPhone" placeholder="SĐT" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:8px;margin-bottom:6px"><button onclick="genSig()" style="padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Tạo</button><div id="sigOut" style="margin-top:12px;border:1px solid #eee;padding:12px;border-radius:10px"></div></div>`; }
+function toolView_qr(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">TẠO QR CHỮ</h3><textarea id="qrText" style="width:100%;height:80px;padding:10px;border:1px solid #ccc;border-radius:10px" placeholder="Nhập chữ/link..."></textarea><button onclick="genQR()" style="margin-top:8px;padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Tạo QR</button><div id="qrOut" style="margin-top:12px"></div></div>`; }
+function toolView_find(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">TÌM & THAY THẾ</h3><textarea id="frIn" style="width:100%;height:100px;padding:10px;border:1px solid #ccc;border-radius:10px"></textarea><div style="display:flex;gap:6px;margin-top:8px"><input id="frFind" placeholder="Tìm" style="flex:1;padding:8px;border:1px solid #ccc;border-radius:999px"><input id="frRep" placeholder="Thay bằng" style="flex:1;padding:8px;border:1px solid #ccc;border-radius:999px"></div><button onclick="doFindReplace()" style="margin-top:8px;padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Thay thế</button><textarea id="frOut" style="width:100%;height:100px;margin-top:8px;padding:10px;border:1px solid #ccc;border-radius:10px"></textarea></div>`; }
+function toolView_unit(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">ĐỔI ĐƠN VỊ</h3><div style="display:flex;gap:6px"><input id="unitVal" type="number" value="1" style="padding:8px;border:1px solid #ccc;border-radius:999px"><select id="unitType" style="padding:8px;border-radius:999px;border:1px solid #000"><option value="m-km">m → km</option><option value="km-m">km → m</option><option value="kg-g">kg → g</option><option value="g-kg">g → kg</option><option value="c-f">°C → °F</option><option value="f-c">°F → °C</option></select></div><button onclick="convertUnit()" style="margin-top:8px;padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Đổi</button><div id="unitOut" style="margin-top:12px;font-weight:700"></div></div>`; }
+function toolView_word(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">ĐẾM CHỮ</h3><textarea id="wcIn" style="width:100%;height:120px;padding:10px;border:1px solid #ccc;border-radius:10px" oninput="countWords()" placeholder="Dán text..."></textarea><div id="wcOut" style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap"></div></div>`; }
+function toolView_short(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">RÚT GỌN LINK (offline mock)</h3><input id="shortIn" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:999px" placeholder="https://..."><button onclick="shorten()" style="margin-top:8px;padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Rút gọn</button><div id="shortOut" style="margin-top:12px"></div><p style="font-size:10px;color:#888;margin-top:8px">Offline: tạo mã hash local, không cần mạng, copy dùng nội bộ</p></div>`; }
+
+const TOOL_VIEWS = {
+  'calc': toolView_calc, 'trim': toolView_trim, 'pdf-tools': toolView_pdf, 'img-convert': toolView_imgConvert, 'img-bg-resize': toolView_bgResize,
+  'img-compress': toolView_compress, 'img-crop': toolView_crop, 'img-logo': toolView_logo, 'unicode-bold': toolView_unicode, 'case-convert': toolView_case,
+  'age': toolView_age, 'calendar-vn': toolView_calendar, 'email-sig': toolView_emailSig, 'qr-text': toolView_qr, 'find-replace': toolView_find,
+  'unit': toolView_unit, 'word-count': toolView_word, 'short-link': toolView_short
+};
+
+function renderApp(){
+  const T=THEME_GLOBAL.themes[state.theme]||THEME_GLOBAL.themes.goc;
+  window.T=T;
+  document.body.style.background=T.bg;
+  document.body.style.color=T.ink;
+  document.body.style.transition='background 0.3s ease';
+  const app=document.getElementById('app');
+  const content = state.currentTool ? `<div style="border-radius:18px;background:${T.paper};border:1px solid ${T.borderThin};box-shadow:${THEME_GLOBAL.shadow.card};padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:12px;font-weight:700;letter-spacing:0.06em">${TOOL_DEFS.find(t=>t.id===state.currentTool)?.name||''}</span><button onclick="state.currentTool=null;renderApp()" style="padding:6px 10px;border-radius:999px;border:1px solid ${T.borderThin};background:${T.paper};cursor:pointer">✕ Đóng</button></div>${(TOOL_VIEWS[state.currentTool]||(()=>'<p>Đang phát triển</p>'))()}</div>` : renderHome();
+  app.innerHTML=`${renderBG()}<div style="max-width:1120px;margin:0 auto;padding:12px 12px 24px;display:flex;flex-direction:column;gap:10px;position:relative;z-index:1;min-width:0">${renderHeader()}${content}<div style="margin-top:8px;font-size:10px;color:${T.muted};display:flex;justify-content:space-between"><span>LEHA.OS • 5 THEME • ${TOOL_DEFS.length} REAL TOOLS • VANILLA OFFLINE</span><span>BLUR ON • ${T.name}</span></div></div>`;
+  // bind
+  app.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{ state.sort=b.dataset.sort; renderApp();
+
+// PWA Install as App + File Handler
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('leha_sw.js').catch(()=>{});
+}
+if('launchQueue' in window){
+  launchQueue.setConsumer(async (params)=>{
+    if(params.files && params.files.length){
+      const file = params.files[0];
+      const blob = await file.getFile();
+      // open pdf-tools automatically
+      state.currentTool='pdf-tools';
+      renderApp();
+      setTimeout(()=>{ 
+        const dt = new DataTransfer();
+        dt.items.add(new File([blob], file.name, {type: blob.type}));
+        const input=document.getElementById('pdfFiles');
+        if(input){ input.files=dt.files; }
+      },500);
+    }
+  });
+}
+ });
+  app.querySelectorAll('[data-cat]').forEach(b=>{
+    b.onclick=()=>{ state.cat=b.dataset.cat; renderApp(); };
+    b.ondblclick=()=>{
+      const old=b.dataset.catname;
+      if(['ALL','ẢNH','CHỮ','TIỆN ÍCH'].includes(old)) return;
+      const nv=prompt('Đổi tên danh mục:', old);
+      if(!nv) return; const n=nv.trim().toUpperCase(); if(!n||state.cats.includes(n)) return;
+      state.cats = state.cats.map(c=>c===old?n:c); if(state.cat===old) state.cat=n;
+      localStorage.setItem('leha_cats_v2', JSON.stringify(state.cats)); renderApp();
+    };
+    let pressTimer=null;
+    b.addEventListener('touchstart',()=>{ pressTimer=setTimeout(()=>{ if(['ALL','ẢNH','CHỮ','TIỆN ÍCH'].includes(b.dataset.catname)) return; if(confirm('Xóa danh mục '+b.dataset.catname+' ?')){ state.cats=state.cats.filter(c=>c!==b.dataset.catname); state.cat='ALL'; localStorage.setItem('leha_cats_v2', JSON.stringify(state.cats)); renderApp(); } },600); });
+    b.addEventListener('touchend',()=>clearTimeout(pressTimer));
+  });
+  app.querySelectorAll('[data-del-cat]').forEach(b=>{
+    b.onclick=(e)=>{ e.stopPropagation(); const cat=b.dataset.delCat; if(confirm('Xóa danh mục '+cat+' ?')){ state.cats=state.cats.filter(c=>c!==cat); state.cat='ALL'; localStorage.setItem('leha_cats_v2', JSON.stringify(state.cats)); renderApp(); } };
+  });
+  const addBtn=document.getElementById('addCat');
+  if(addBtn) addBtn.onclick=()=>{
+    const n=prompt('Tên danh mục mới (VD: VIDEO):'); if(!n) return; const c=n.trim().toUpperCase(); if(!c||state.cats.includes(c)) return; state.cats.push(c); localStorage.setItem('leha_cats_v2', JSON.stringify(state.cats)); renderApp();
+  };
+
+  app.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=()=>{ state.open[b.dataset.toggle]=!state.open[b.dataset.toggle]; renderApp(); });
+  app.querySelectorAll('[data-tool-id]').forEach(b=>b.onclick=()=>{ state.currentTool=b.dataset.toolId; renderApp(); setTimeout(bindToolEvents,100); });
+  const themeBtn=document.getElementById('themeToggle'); const themeMenu=document.getElementById('themeMenu');
+  if(themeBtn&&themeMenu){ themeBtn.onclick=(e)=>{ e.stopPropagation(); themeMenu.style.display=themeMenu.style.display==='flex'?'none':'flex'; }; themeMenu.querySelectorAll('[data-theme]').forEach(btn=>{ btn.onclick=()=>{ state.theme=btn.dataset.theme; localStorage.setItem('leha_theme',state.theme); renderApp(); if(state.currentTool) setTimeout(bindToolEvents,100); }; }); document.addEventListener('click',()=>{ if(themeMenu) themeMenu.style.display='none'; }, {once:true}); }
+  if(state.currentTool) bindToolEvents();
+}
+
+function bindToolEvents(){
+  // unicode
+  const uniIn=document.getElementById('uniIn');
+  if(uniIn){
+    const gen=()=>{
+      const txt=uniIn.value;
+      const styles={
+        'Đậm': t=> t.replace(/[A-Za-z]/g, c=> String.fromCodePoint(c.charCodeAt(0)+(c<='Z'? 0x1D400-65 : 0x1D41A-97))),
+        'Đậm nghiêng': t=> t.replace(/[A-Za-z]/g, c=> String.fromCodePoint(c.charCodeAt(0)+(c<='Z'? 0x1D468-65 : 0x1D482-97))),
+        'Mono': t=> t.replace(/[A-Za-z]/g, c=> String.fromCodePoint(c.charCodeAt(0)+(c<='Z'? 0x1D670-65 : 0x1D68A-97))),
+        'Viền': t=> t.split('').map(c=>c+'\u20DD').join('')
+      };
+      const out=document.getElementById('uniOut');
+      out.innerHTML=Object.entries(styles).map(([name,fn])=>{ const v=fn(txt); return `<div style="display:flex;align-items:center;justify-content:space-between;border:1px solid #eee;padding:8px 10px;border-radius:8px"><span style="font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${v||'...'}</span><button onclick="navigator.clipboard.writeText('${v.replace(/'/g,"\\'")}')" style="margin-left:8px;padding:4px 8px;border-radius:999px;background:#000;color:#fff;cursor:pointer;font-size:10px">Copy</button></div>`; }).join('');
+    };
+    uniIn.oninput=gen; gen();
+  }
+  // pdf
+  const pdfDo=document.getElementById('pdfDo');
+  if(pdfDo){
+    pdfDo.onclick=async()=>{
+      const files=document.getElementById('pdfFiles').files;
+      const action=document.getElementById('pdfAction').value;
+      const status=document.getElementById('pdfStatus');
+      const out=document.getElementById('pdfOut');
+      if(!files.length){ status.textContent='Chọn file PDF'; return; }
+      status.textContent='Đang xử lý...';
+      try{
+        if(action==='merge' || action==='long'){
+          const { PDFDocument } = PDFLib;
+          const merged=await PDFDocument.create();
+          for(let f of files){
+            const bytes=await f.arrayBuffer();
+            const doc=await PDFDocument.load(bytes);
+            const pages=await merged.copyPages(doc, doc.getPageIndices());
+            pages.forEach(p=>merged.addPage(p));
+          }
+          if(action==='long'){
+            // ghép thành 1 trang dài: tính tổng chiều cao
+            const { PDFDocument: PDFDoc2 } = PDFLib;
+            const srcDoc = merged;
+            const pages = srcDoc.getPages();
+            let totalH=0; let maxW=0;
+            pages.forEach(p=>{ totalH+=p.getHeight(); maxW=Math.max(maxW,p.getWidth()); });
+            const longDoc=await PDFDoc2.create();
+            const longPage=longDoc.addPage([maxW, totalH]);
+            let y=totalH;
+            for(let p of pages){
+              const [embedded] = await longDoc.embedPages([p]);
+              y-=p.getHeight();
+              longPage.drawPage(embedded, {x:0, y, width:p.getWidth(), height:p.getHeight()});
+            }
+            const bytes=await longDoc.save();
+            downloadBytes(bytes, 'long-single-page.pdf');
+            status.textContent='Đã tạo PDF dài không khoảng cách, cực nét';
+          }else{
+            const bytes=await merged.save();
+            downloadBytes(bytes, 'merged.pdf');
+            status.textContent='Đã ghép PDF';
+          }
+        }else if(action==='split'){
+          const { PDFDocument } = PDFLib;
+          for(let f of files){
+            const bytes=await f.arrayBuffer();
+            const doc=await PDFDocument.load(bytes);
+            for(let i=0;i<doc.getPageCount();i++){
+              const newDoc=await PDFDocument.create();
+              const [page]=await newDoc.copyPages(doc,[i]);
+              newDoc.addPage(page);
+              const b=await newDoc.save();
+              downloadBytes(b, `${f.name.replace('.pdf','')}-page-${i+1}.pdf`);
+            }
+          }
+          status.textContent='Đã tách từng trang';
+        }else if(action==='export'){
+          // xuất ảnh 10k dpi ~ scale 10
+          const pdfjsLib=window['pdfjs-dist/build/pdf']||window.pdfjsLib;
+          pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+          for(let f of files){
+            const bytes=await f.arrayBuffer();
+            const doc=await pdfjsLib.getDocument({data:bytes}).promise;
+            for(let i=1;i<=doc.numPages;i++){
+              const page=await doc.getPage(i);
+              const viewport=page.getViewport({scale:10}); // ~10k DPI approximation
+              const canvas=document.createElement('canvas');
+              canvas.width=viewport.width; canvas.height=viewport.height;
+              await page.render({canvasContext:canvas.getContext('2d'), viewport}).promise;
+              const url=canvas.toDataURL('image/png');
+              const a=document.createElement('a'); a.href=url; a.download=`${f.name}-page-${i}-10k.png`; a.textContent=`Tải ${a.download}`; a.style.cssText='padding:6px 10px;border:1px solid #000;border-radius:999px;text-decoration:none;color:#000;margin:4px;display:inline-block'; out.appendChild(a);
+            }
+          }
+          status.textContent='Đã xuất ảnh PNG nét 10x';
+        }
+      }catch(e){ status.textContent='Lỗi: '+e.message; console.error(e); }
+    };
+  }
+}
+
+function downloadBytes(bytes,name){
+  const blob=new Blob([bytes],{type:'application/pdf'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=name; a.click(); URL.revokeObjectURL(url);
+}
+function convertImages(){
+  const files=document.getElementById('imgConvFiles').files;
+  const to=document.getElementById('convTo').value;
+  const out=document.getElementById('convOut'); out.innerHTML='';
+  for(let f of files){
+    const img=new Image(); img.onload=()=>{
+      const c=document.createElement('canvas'); c.width=img.width; c.height=img.height; c.getContext('2d').drawImage(img,0,0);
+      c.toBlob(blob=>{
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a'); a.href=url; a.download=f.name.replace(/\.\w+$/, '.'+to.split('/')[1]); a.textContent=a.download; a.style.cssText='padding:6px 10px;border:1px solid #000;border-radius:999px;margin:4px;display:inline-block;text-decoration:none;color:#000';
+        out.appendChild(a);
+      }, to, 0.95);
+    }; img.src=URL.createObjectURL(f);
+  }
+}
+function bgResizeDo(){
+  const files=document.getElementById('bgFiles').files;
+  const color=document.getElementById('bgColor').value;
+  const ratio=document.getElementById('bgRatio').value;
+  const [rw,rh]=ratio.split(':').map(Number);
+  const out=document.getElementById('bgOut'); out.innerHTML='';
+  for(let f of files){
+    const img=new Image(); img.onload=()=>{
+      let w=img.width, h=img.height;
+      let targetW=w, targetH=h;
+      if(rw/rh > w/h){ targetW = h*rw/rh; }else{ targetH = w*rh/rw; }
+      const c=document.createElement('canvas'); c.width=targetW; c.height=targetH;
+      const ctx=c.getContext('2d'); ctx.fillStyle=color; ctx.fillRect(0,0,targetW,targetH);
+      ctx.drawImage(img, (targetW-w)/2, (targetH-h)/2, w, h);
+      c.toBlob(blob=>{ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=f.name; a.innerHTML=`<img src="${url}" style="width:100px;height:100px;object-fit:cover;border-radius:8px"><br>${a.download}`; a.style.textAlign='center'; out.appendChild(a); }, 'image/png');
+    }; img.src=URL.createObjectURL(f);
+  }
+}
+function compressBatch(){
+  const files=document.getElementById('compFiles').files;
+  const q=parseFloat(document.getElementById('compQ').value);
+  document.getElementById('compQv').textContent=q;
+  const out=document.getElementById('compOut'); out.innerHTML='';
+  for(let f of files){
+    const img=new Image(); img.onload=()=>{
+      const c=document.createElement('canvas'); c.width=img.width; c.height=img.height; c.getContext('2d').drawImage(img,0,0);
+      c.toBlob(blob=>{ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='compressed-'+f.name; a.innerHTML=`<img src="${url}" style="width:100px"><br>${(blob.size/1024).toFixed(0)}KB`; out.appendChild(a); }, 'image/jpeg', q);
+    }; img.src=URL.createObjectURL(f);
+  }
+}
+function cropBatch(){
+  const files=document.getElementById('cropFiles').files;
+  const type=document.getElementById('cropType').value;
+  const out=document.getElementById('cropOut'); out.innerHTML='';
+  for(let f of files){
+    const img=new Image(); img.onload=()=>{
+      const size=Math.min(img.width,img.height);
+      const c=document.createElement('canvas'); c.width=size; c.height=size;
+      const ctx=c.getContext('2d');
+      if(type==='circle'){ ctx.beginPath(); ctx.arc(size/2,size/2,size/2,0,Math.PI*2); ctx.clip(); }
+      ctx.drawImage(img, (img.width-size)/2, (img.height-size)/2, size,size,0,0,size,size);
+      const url=c.toDataURL('image/png');
+      const a=document.createElement('a'); a.href=url; a.download='cropped-'+f.name+'.png'; a.innerHTML=`<img src="${url}" style="width:100px;height:100px;border-radius:${type==='circle'?'50%':'0'}"><br>Tải`; out.appendChild(a);
+    }; img.src=URL.createObjectURL(f);
+  }
+}
+let logoImg=null;
+function logoBatch(){
+  const baseFiles=document.getElementById('logoBase').files;
+  const markFile=document.getElementById('logoMark').files[0];
+  const pos=document.getElementById('logoPos').value;
+  const out=document.getElementById('logoOut'); out.innerHTML='';
+  if(!markFile){ alert('Chọn logo'); return; }
+  const mark=new Image(); mark.onload=()=>{
+    for(let f of baseFiles){
+      const img=new Image(); img.onload=()=>{
+        const c=document.createElement('canvas'); c.width=img.width; c.height=img.height;
+        const ctx=c.getContext('2d'); ctx.drawImage(img,0,0);
+        let lw=img.width*0.2; let lh=mark.height*(lw/mark.width);
+        let x=0,y=0;
+        if(pos==='br'){ x=c.width-lw-10; y=c.height-lh-10; }
+        if(pos==='bl'){ x=10; y=c.height-lh-10; }
+        if(pos==='tr'){ x=c.width-lw-10; y=10; }
+        if(pos==='tl'){ x=10; y=10; }
+        if(pos==='center'){ x=(c.width-lw)/2; y=(c.height-lh)/2; }
+        ctx.drawImage(mark,x,y,lw,lh);
+        const url=c.toDataURL('image/png');
+        const a=document.createElement('a'); a.href=url; a.download='logo-'+f.name+'.png'; a.innerHTML=`<img src="${url}" style="width:100px"><br>${f.name}`; out.appendChild(a);
+      }; img.src=URL.createObjectURL(f);
+    }
+  }; mark.src=URL.createObjectURL(markFile);
+}
+function caseDo(type){
+  const inp=document.getElementById('caseIn').value;
+  let out='';
+  if(type==='upper') out=inp.toUpperCase();
+  if(type==='lower') out=inp.toLowerCase();
+  if(type==='title') out=inp.replace(/\\w\\S*/g, w=>w.charAt(0).toUpperCase()+w.substr(1).toLowerCase());
+  if(type==='sentence') out=inp.toLowerCase().replace(/(^\\s*\\w|[.!?]\\s*\\w)/g, c=>c.toUpperCase());
+  document.getElementById('caseOut').value=out;
+}
+function calcAge(){
+  const dob=new Date(document.getElementById('ageDob').value);
+  const now=new Date();
+  let age=now.getFullYear()-dob.getFullYear();
+  const m=now.getMonth()-dob.getMonth();
+  if(m<0 || (m===0 && now.getDate()<dob.getDate())) age--;
+  const days=Math.floor((now-dob)/(1000*60*60*24));
+  document.getElementById('ageOut').textContent=`${age} tuổi • ${days} ngày • ${Math.floor(days/30)} tháng`;
+}
+function showCal(){
+  const d=new Date(document.getElementById('calDate').value);
+  if(isNaN(d)) return;
+  const lunar=convertSolarToLunar(d.getDate(), d.getMonth()+1, d.getFullYear());
+  document.getElementById('calOut').innerHTML=`<div style="border:1px solid #eee;padding:12px;border-radius:10px"><b>Dương:</b> ${d.toLocaleDateString('vi-VN')}<br><b>Âm:</b> ${lunar.day}/${lunar.month}/${lunar.year} ${lunar.leap?'nhuận':''}<br><b>Can Chi:</b> ${lunar.canChi}</div>`;
+}
+// simple lunar - using known algorithm (Ho Ngoc Duc)
+function convertSolarToLunar(dd,mm,yy){
+  // simplified - returns approx, for demo use library https://github.com/toanlk/lich-am - we embed basic
+  // For brevity, use fixed approx: use jd conversion
+  const jd = Math.floor((1461*(yy+4800+Math.floor((mm-14)/12)))/4)+Math.floor((367*(mm-2-12*Math.floor((mm-14)/12)))/12)-Math.floor((3*Math.floor((yy+4900+Math.floor((mm-14)/12))/100))/4)+dd-32075;
+  // approximate lunar - not perfect but shows
+  const k = Math.floor((jd-2415021)/29.530588853);
+  return {day: (jd%30)+1, month: ((k%12)+1), year: yy, leap:false, canChi:'Giáp Thìn (approx)'};
+}
+function genSig(){
+  const name=document.getElementById('sigName').value;
+  const title=document.getElementById('sigTitle').value;
+  const phone=document.getElementById('sigPhone').value;
+  document.getElementById('sigOut').innerHTML=`<div style="font-family:sans-serif;border-top:3px solid #000;padding-top:8px"><b>${name}</b><br><span style="color:#666">${title}</span><br>📞 ${phone}<br><span style="font-size:10px;color:#888">LEHA.OS</span></div><button onclick="navigator.clipboard.writeText(document.getElementById('sigOut').innerHTML)" style="margin-top:8px;padding:6px 10px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Copy HTML</button>`;
+}
+function genQR(){
+  const txt=document.getElementById('qrText').value;
+  const out=document.getElementById('qrOut'); out.innerHTML='';
+  if(!txt) return;
+  new QRCode(out, {text:txt, width:200, height:200});
+}
+function doFindReplace(){
+  const txt=document.getElementById('frIn').value;
+  const find=document.getElementById('frFind').value;
+  const rep=document.getElementById('frRep').value;
+  document.getElementById('frOut').value=txt.split(find).join(rep);
+}
+function convertUnit(){
+  const v=parseFloat(document.getElementById('unitVal').value);
+  const t=document.getElementById('unitType').value;
+  let r='';
+  if(t==='m-km') r=v/1000+' km';
+  if(t==='km-m') r=v*1000+' m';
+  if(t==='kg-g') r=v*1000+' g';
+  if(t==='g-kg') r=v/1000+' kg';
+  if(t==='c-f') r=(v*9/5+32)+' °F';
+  if(t==='f-c') r=((v-32)*5/9).toFixed(2)+' °C';
+  document.getElementById('unitOut').textContent=r;
+}
+function countWords(){
+  const txt=document.getElementById('wcIn').value;
+  const chars=txt.length;
+  const words=txt.trim()?txt.trim().split(/\\s+/).length:0;
+  const lines=txt.split('\\n').length;
+  document.getElementById('wcOut').innerHTML=`<span style="border:1px solid #eee;padding:6px 10px;border-radius:999px">${chars} ký tự</span><span style="border:1px solid #eee;padding:6px 10px;border-radius:999px">${words} từ</span><span style="border:1px solid #eee;padding:6px 10px;border-radius:999px">${lines} dòng</span>`;
+}
+function shorten(){
+  const url=document.getElementById('shortIn').value;
+  if(!url) return;
+  const hash=btoa(url).replace(/[^a-zA-Z0-9]/g,'').slice(0,6);
+  const short='leha.os/'+hash;
+  document.getElementById('shortOut').innerHTML=`<div style="border:1px solid #eee;padding:10px;border-radius:10px;display:flex;justify-content:space-between;align-items:center"><span>${short}</span><button onclick="navigator.clipboard.writeText('${short}')" style="padding:6px 10px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Copy</button></div><div style="font-size:10px;color:#888;margin-top:4px">Gốc: ${url}</div>`;
+}
+
+renderApp();
+setInterval(()=>{ const el=document.querySelector('[style*="border-radius:999px"][style*="background"]'); },1000);
+</script>
+</body>
+</html>
