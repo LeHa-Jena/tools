@@ -38,14 +38,14 @@ input,textarea,select,button{font-family:inherit}
 // FIX AT: Neu doi mau chung sua o THEME_GLOBAL Search: THEME_GLOBAL | If global color edit at THEME_GLOBAL
 const THEME_GLOBAL = {
   themes: {
-    goc: { name:'GỐC • TRẮNG', bg:'#F2F2F3', paper:'#FFFFFF', paperBlur:'rgba(255,255,255,0.86)', ink:'#0A0A0B', border:'#E4E4E7', borderThin:'#EDEEF1', borderContrast:'rgba(0,0,0,0.06)', muted:'#8A8A8E', labAnh:'#FF3B30', labChu:'#7C3AED', labTienIch:'#F59E0B' },
-    mono: { name:'MONO • TRẮNG VIỀN ĐEN', bg:'#FFFFFF', paper:'#FFFFFF', paperBlur:'rgba(255,255,255,0.92)', ink:'#000000', border:'#000000', borderThin:'#000000', borderContrast:'rgba(0,0,0,0.12)', muted:'#666666', labAnh:'#000000', labChu:'#000000', labTienIch:'#000000' },
-    sand: { name:'SAND • VÀNG ẤM', bg:'#FFF6D6', paper:'#FFFEF2', paperBlur:'rgba(255,254,242,0.90)', ink:'#3D2E00', border:'#F5D78E', borderThin:'#FBE9B0', borderContrast:'rgba(61,46,0,0.08)', muted:'#8A8A8E', labAnh:'#D4A017', labChu:'#B8860B', labTienIch:'#E6B422' },
-    midnight: { name:'MIDNIGHT • XANH ĐEN ĐẬM', bg:'#050E1F', paper:'#102040', paperBlur:'rgba(16,32,64,0.90)', ink:'#E6F0FF', border:'#1E3A66', borderThin:'#24467D', borderContrast:'rgba(36,70,125,0.45)', muted:'#7FA0CC', labAnh:'#3B82F6', labChu:'#60A5FA', labTienIch:'#38BDF8' },
-    night: { name:'NIGHT • ĐEN', bg:'#000000', paper:'#121212', paperBlur:'rgba(18,18,18,0.92)', ink:'#FFFFFF', border:'#2A2A2A', borderThin:'#333333', borderContrast:'rgba(255,255,255,0.10)', muted:'#AAAAAA', labAnh:'#FFFFFF', labChu:'#E5E5E5', labTienIch:'#CCCCCC' }
+    goc: { name:'WHITE', bg:'#F2F2F3', paper:'#FFFFFF', paperBlur:'rgba(255,255,255,0.86)', ink:'#0A0A0B', border:'#E4E4E7', borderThin:'#EDEEF1', borderContrast:'rgba(0,0,0,0.06)', muted:'#8A8A8E', labAnh:'#FF3B30', labChu:'#7C3AED', labTienIch:'#F59E0B' },
+    mono: { name:'MONO', bg:'#FFFFFF', paper:'#FFFFFF', paperBlur:'rgba(255,255,255,0.92)', ink:'#000000', border:'#000000', borderThin:'#000000', borderContrast:'rgba(0,0,0,0.12)', muted:'#666666', labAnh:'#000000', labChu:'#000000', labTienIch:'#000000' },
+    sand: { name:'SAND', bg:'#FFF6D6', paper:'#FFFEF2', paperBlur:'rgba(255,254,242,0.90)', ink:'#3D2E00', border:'#F5D78E', borderThin:'#FBE9B0', borderContrast:'rgba(61,46,0,0.08)', muted:'#8A8A8E', labAnh:'#D4A017', labChu:'#B8860B', labTienIch:'#E6B422' },
+    midnight: { name:'MIDNIGHT', bg:'#050E1F', paper:'#102040', paperBlur:'rgba(16,32,64,0.90)', ink:'#E6F0FF', border:'#1E3A66', borderThin:'#24467D', borderContrast:'rgba(36,70,125,0.45)', muted:'#7FA0CC', labAnh:'#3B82F6', labChu:'#60A5FA', labTienIch:'#38BDF8' },
+    night: { name:'NIGHT', bg:'#000000', paper:'#121212', paperBlur:'rgba(18,18,18,0.92)', ink:'#FFFFFF', border:'#2A2A2A', borderThin:'#333333', borderContrast:'rgba(255,255,255,0.10)', muted:'#AAAAAA', labAnh:'#FFFFFF', labChu:'#E5E5E5', labTienIch:'#CCCCCC' }
   },
   font: '"Be Vietnam Pro", system-ui, sans-serif',
-  fontWeight: { header:800, label:700, tool:600, muted:500 },
+  fontWeight: { header:600, label:500, tool:400, muted:300 },
   radius: { sm:'10px', md:'14px', lg:'18px', xl:'24px', pill:'999px' },
   shadow: { card:'0 2px 12px rgba(0,0,0,0.06)', glowRed:'0 0 24px rgba(255,59,48,0.35)', glowViolet:'0 0 24px rgba(124,58,237,0.35)', glowAmber:'0 0 24px rgba(245,158,11,0.35)' },
   blur: { blob:'64px', opacity:0.12, duration:'22s' },
@@ -61,7 +61,7 @@ const MENU_CONFIG = {
   defaultSort:'TẤT CẢ', defaultCat:'ALL',
   row1:{ label:'SẮP XẾP', options:['TẤT CẢ','MỚI THÊM','A→Z'] },
   row2:{ label:'DANH MỤC', defaultOptions:['ALL','ẢNH','CHỮ','TIỆN ÍCH'] },
-  layout:{ gap:6, radius:'999px', padY:7, padX:14, fontSize:11, fontWeight:500 }
+  layout:{ gap:6, radius:'999px', padY:7, padX:14, fontSize:8, fontWeight:400 }
 };
 const BG_ANIM_CONFIG = { size:220, blur:'64px', opacity:0.12 };
 
@@ -69,17 +69,17 @@ const BG_ANIM_CONFIG = { size:220, blur:'64px', opacity:0.12 };
 const TOOL_DEFS = [
   {id:'calc', name:'MÁY TÍNH', cat:'tienich', group:'TIỆN ÍCH', addedAt:1},
   {id:'trim', name:'XÓA KHOẢNG TRỐNG', cat:'chu', group:'CHỮ', addedAt:2},
-  {id:'pdf-tools', name:'PDF NÉT - GHÉP/CẮT/TÁCH/NÉN/XUẤT ẢNH 10K DPI', cat:'anh', group:'ẢNH', addedAt:3},
-  {id:'img-convert', name:'JPG/PNG/WEBP ĐỔI ĐỊNH DẠNG', cat:'anh', group:'ẢNH', addedAt:4},
-  {id:'img-bg-resize', name:'CHÈN NỀN + ĐỔI SIZE 1:1/3:4', cat:'anh', group:'ẢNH', addedAt:5},
-  {id:'img-compress', name:'NÉN ẢNH ĐỒNG LOẠT', cat:'anh', group:'ẢNH', addedAt:6},
-  {id:'img-crop', name:'CẮT ẢNH VUÔNG/TRÒN ĐỒNG LOẠT', cat:'anh', group:'ẢNH', addedAt:7},
-  {id:'img-logo', name:'CHÈN LOGO ĐỒNG LOẠT GIỮ SIZE GỐC', cat:'anh', group:'ẢNH', addedAt:8},
-  {id:'unicode-bold', name:'CHỮ ĐẬM UNICODE + COPY', cat:'chu', group:'CHỮ', addedAt:9},
-  {id:'case-convert', name:'HOA/thường/Đầu Câu + COPY', cat:'chu', group:'CHỮ', addedAt:10},
+  {id:'pdf-tools', name:'PDF - XUẤT ẢNH 10K DPI', cat:'anh', group:'ẢNH', addedAt:3},
+  {id:'img-convert', name:'JPG/PNG/WEBP', cat:'anh', group:'ẢNH', addedAt:4},
+  {id:'img-bg-resize', name:'ĐỔI SIZE', cat:'anh', group:'ẢNH', addedAt:5},
+  {id:'img-compress', name:'NÉN ẢNH', cat:'anh', group:'ẢNH', addedAt:6},
+  {id:'img-crop', name:'CẮT ẢNH', cat:'anh', group:'ẢNH', addedAt:7},
+  {id:'img-logo', name:'CHÈN LOGO', cat:'anh', group:'ẢNH', addedAt:8},
+  {id:'unicode-bold', name:'UNICODE', cat:'chu', group:'CHỮ', addedAt:9},
+  {id:'case-convert', name:'HOA/THƯỜNG', cat:'chu', group:'CHỮ', addedAt:10},
   {id:'age', name:'MÁY TÍNH TUỔI', cat:'tienich', group:'TIỆN ÍCH', addedAt:11},
-  {id:'calendar-vn', name:'LỊCH VN DƯƠNG ÂM', cat:'tienich', group:'TIỆN ÍCH', addedAt:12},
-  {id:'email-sig', name:'TẠO CHỮ KÝ EMAIL', cat:'chu', group:'CHỮ', addedAt:13},
+  {id:'calendar-vn', name:'LỊCH VN', cat:'tienich', group:'TIỆN ÍCH', addedAt:12},
+  {id:'email-sig', name:'CHỮ KÝ EMAIL', cat:'chu', group:'CHỮ', addedAt:13},
   {id:'qr-text', name:'TẠO QR CHỮ', cat:'tienich', group:'TIỆN ÍCH', addedAt:14},
   {id:'find-replace', name:'TÌM & THAY THẾ', cat:'chu', group:'CHỮ', addedAt:15},
   {id:'unit', name:'ĐỔI ĐƠN VỊ', cat:'tienich', group:'TIỆN ÍCH', addedAt:16},
@@ -112,7 +112,7 @@ function renderHeader(){
         </div>
       </div>
       <span style="font-size:12px;font-weight:800;background:${T.ink};color:${T.paper};padding:4px 8px;border-radius:999px">${getTime()}</span>
-      ${state.currentTool?`<button onclick="state.currentTool=null;renderApp()" style="height:28px;padding:0 10px;border-radius:999px;border:1px solid ${T.borderThin};background:${T.paper};color:${T.ink};font-size:10px;font-weight:700;cursor:pointer">← QUAY LẠI</button>`:''}
+      ${state.currentTool?`<button onclick="state.currentTool=null;renderApp()" style="height:28px;padding:0 10px;border-radius:999px;border:1px solid ${T.borderThin};background:${T.paper};color:${T.ink};font-size:8px;font-weight:700;cursor:pointer">← QUAY LẠI</button>`:''}
     </div>
   </div>`;
 }
@@ -126,7 +126,7 @@ function groupByCat(tools){
 function renderToolCard(tool){
   const T=THEME_GLOBAL.themes[state.theme];
   return `<div class="tool-card" data-tool-id="${tool.id}" style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 8px;border-radius:14px;background:${T.paper};border:1px solid ${T.borderThin};box-shadow:${THEME_GLOBAL.shadow.card};cursor:pointer">
-    <span style="font-size:12px;font-weight:600;color:${T.ink}">${tool.name}</span><span style="font-size:10px;color:${T.muted}">↗</span></div>`;
+    <span style="font-size:11px;font-weight:500;color:${T.ink}">${tool.name}</span><span style="font-size:10px;color:${T.muted}">↗</span></div>`;
 }
 
 
@@ -195,11 +195,11 @@ function toolView_bgResize(){ return `<div><h3 style="font-weight:800;margin-bot
 function toolView_compress(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">NÉN ẢNH ĐỒNG LOẠT</h3><input type="file" id="compFiles" multiple accept="image/*"><div style="margin-top:8px"><label>Quality: <input type="range" id="compQ" min="0.1" max="1" step="0.1" value="0.7"> <span id="compQv">0.7</span></label> <button onclick="compressBatch()" style="padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer;margin-left:8px">Nén</button></div><div id="compOut" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px"></div></div>`; }
 function toolView_crop(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">CẮT ẢNH VUÔNG/TRÒN ĐỒNG LOẠT</h3><input type="file" id="cropFiles" multiple accept="image/*"><div style="margin-top:8px;display:flex;gap:6px"><select id="cropType" style="padding:8px;border-radius:999px;border:1px solid #000"><option value="square">Vuông</option><option value="circle">Tròn</option></select><button onclick="cropBatch()" style="padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Cắt</button></div><div id="cropOut" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px"></div></div>`; }
 function toolView_logo(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">CHÈN LOGO ĐỒNG LOẠT GIỮ SIZE GỐC</h3><label>Ảnh gốc: <input type="file" id="logoBase" multiple accept="image/*"></label><br><label style="margin-top:8px;display:block">Logo: <input type="file" id="logoMark" accept="image/*"></label><div style="margin-top:8px;display:flex;gap:6px"><select id="logoPos" style="padding:8px;border-radius:999px;border:1px solid #000"><option value="br">Góc phải dưới</option><option value="bl">Trái dưới</option><option value="tr">Phải trên</option><option value="tl">Trái trên</option><option value="center">Giữa</option></select><button onclick="logoBatch()" style="padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Chèn</button></div><div id="logoOut" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px"></div></div>`; }
-function toolView_unicode(){ const map={bold:'𝐀', italic:'𝐴', mono:'𝙰'}; return `<div><h3 style="font-weight:800;margin-bottom:8px">CHỮ ĐẬM UNICODE + COPY</h3><textarea id="uniIn" style="width:100%;height:80px;padding:10px;border:1px solid #ccc;border-radius:10px" placeholder="Nhập chữ..."></textarea><div id="uniOut" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div></div>`; }
-function toolView_case(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">HOA/thường/Đầu Câu + COPY</h3><textarea id="caseIn" style="width:100%;height:100px;padding:10px;border:1px solid #ccc;border-radius:10px"></textarea><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button onclick="caseDo('upper')" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">HOA</button><button onclick="caseDo('lower')" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">thường</button><button onclick="caseDo('title')" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">Hoa Đầu Chữ</button><button onclick="caseDo('sentence')" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">Hoa đầu câu</button></div><textarea id="caseOut" style="width:100%;height:100px;margin-top:8px;padding:10px;border:1px solid #ccc;border-radius:10px"></textarea><button onclick="navigator.clipboard.writeText(document.getElementById('caseOut').value)" style="margin-top:8px;padding:8px 12px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Copy</button></div>`; }
+function toolView_unicode(){ const map={bold:'𝐀', italic:'𝐴', mono:'𝙰'}; return `<div><h3 style="font-weight:800;margin-bottom:8px">UNICODE</h3><textarea id="uniIn" style="width:100%;height:80px;padding:10px;border:1px solid #ccc;border-radius:10px" placeholder="Nhập chữ..."></textarea><div id="uniOut" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div></div>`; }
+function toolView_case(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">HOA/THƯỜNG</h3><textarea id="caseIn" style="width:100%;height:100px;padding:10px;border:1px solid #ccc;border-radius:10px"></textarea><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button onclick="caseDo('upper')" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">HOA</button><button onclick="caseDo('lower')" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">thường</button><button onclick="caseDo('title')" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">Hoa Đầu Chữ</button><button onclick="caseDo('sentence')" style="padding:8px 12px;border-radius:999px;border:1px solid #000;cursor:pointer">Hoa đầu câu</button></div><textarea id="caseOut" style="width:100%;height:100px;margin-top:8px;padding:10px;border:1px solid #ccc;border-radius:10px"></textarea><button onclick="navigator.clipboard.writeText(document.getElementById('caseOut').value)" style="margin-top:8px;padding:8px 12px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Copy</button></div>`; }
 function toolView_age(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">MÁY TÍNH TUỔI</h3><input type="date" id="ageDob" style="padding:8px;border-radius:999px;border:1px solid #000"><button onclick="calcAge()" style="margin-left:8px;padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Tính</button><div id="ageOut" style="margin-top:12px;font-size:18px;font-weight:700"></div></div>`; }
-function toolView_calendar(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">LỊCH VN DƯƠNG ÂM</h3><input type="date" id="calDate" style="padding:8px;border-radius:999px;border:1px solid #000"><button onclick="showCal()" style="margin-left:8px;padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Xem</button><div id="calOut" style="margin-top:12px"></div></div>`; }
-function toolView_emailSig(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">TẠO CHỮ KÝ EMAIL</h3><input id="sigName" placeholder="Tên" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:8px;margin-bottom:6px"><input id="sigTitle" placeholder="Chức danh" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:8px;margin-bottom:6px"><input id="sigPhone" placeholder="SĐT" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:8px;margin-bottom:6px"><button onclick="genSig()" style="padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Tạo</button><div id="sigOut" style="margin-top:12px;border:1px solid #eee;padding:12px;border-radius:10px"></div></div>`; }
+function toolView_calendar(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">LỊCH VN</h3><input type="date" id="calDate" style="padding:8px;border-radius:999px;border:1px solid #000"><button onclick="showCal()" style="margin-left:8px;padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Xem</button><div id="calOut" style="margin-top:12px"></div></div>`; }
+function toolView_emailSig(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">CHỮ KÝ EMAIL</h3><input id="sigName" placeholder="Tên" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:8px;margin-bottom:6px"><input id="sigTitle" placeholder="Chức danh" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:8px;margin-bottom:6px"><input id="sigPhone" placeholder="SĐT" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:8px;margin-bottom:6px"><button onclick="genSig()" style="padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Tạo</button><div id="sigOut" style="margin-top:12px;border:1px solid #eee;padding:12px;border-radius:10px"></div></div>`; }
 function toolView_qr(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">TẠO QR CHỮ</h3><textarea id="qrText" style="width:100%;height:80px;padding:10px;border:1px solid #ccc;border-radius:10px" placeholder="Nhập chữ/link..."></textarea><button onclick="genQR()" style="margin-top:8px;padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Tạo QR</button><div id="qrOut" style="margin-top:12px"></div></div>`; }
 function toolView_find(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">TÌM & THAY THẾ</h3><textarea id="frIn" style="width:100%;height:100px;padding:10px;border:1px solid #ccc;border-radius:10px"></textarea><div style="display:flex;gap:6px;margin-top:8px"><input id="frFind" placeholder="Tìm" style="flex:1;padding:8px;border:1px solid #ccc;border-radius:999px"><input id="frRep" placeholder="Thay bằng" style="flex:1;padding:8px;border:1px solid #ccc;border-radius:999px"></div><button onclick="doFindReplace()" style="margin-top:8px;padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Thay thế</button><textarea id="frOut" style="width:100%;height:100px;margin-top:8px;padding:10px;border:1px solid #ccc;border-radius:10px"></textarea></div>`; }
 function toolView_unit(){ return `<div><h3 style="font-weight:800;margin-bottom:8px">ĐỔI ĐƠN VỊ</h3><div style="display:flex;gap:6px"><input id="unitVal" type="number" value="1" style="padding:8px;border:1px solid #ccc;border-radius:999px"><select id="unitType" style="padding:8px;border-radius:999px;border:1px solid #000"><option value="m-km">m → km</option><option value="km-m">km → m</option><option value="kg-g">kg → g</option><option value="g-kg">g → kg</option><option value="c-f">°C → °F</option><option value="f-c">°F → °C</option></select></div><button onclick="convertUnit()" style="margin-top:8px;padding:8px 14px;border-radius:999px;background:#000;color:#fff;cursor:pointer">Đổi</button><div id="unitOut" style="margin-top:12px;font-weight:700"></div></div>`; }
@@ -221,7 +221,7 @@ function renderApp(){
   document.body.style.transition='background 0.3s ease';
   const app=document.getElementById('app');
   const content = state.currentTool ? `<div style="border-radius:18px;background:${T.paper};border:1px solid ${T.borderThin};box-shadow:${THEME_GLOBAL.shadow.card};padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:12px;font-weight:700;letter-spacing:0.06em">${TOOL_DEFS.find(t=>t.id===state.currentTool)?.name||''}</span><button onclick="state.currentTool=null;renderApp()" style="padding:6px 10px;border-radius:999px;border:1px solid ${T.borderThin};background:${T.paper};cursor:pointer">✕ Đóng</button></div>${(TOOL_VIEWS[state.currentTool]||(()=>'<p>Đang phát triển</p>'))()}</div>` : renderHome();
-  app.innerHTML=`${renderBG()}<div style="max-width:1120px;margin:0 auto;padding:12px 12px 24px;display:flex;flex-direction:column;gap:10px;position:relative;z-index:1;min-width:0">${renderHeader()}${content}<div style="margin-top:8px;font-size:10px;color:${T.muted};display:flex;justify-content:space-between"><span>LEHA.OS • 5 THEME • ${TOOL_DEFS.length} REAL TOOLS • VANILLA OFFLINE</span><span>BLUR ON • ${T.name}</span></div></div>`;
+  app.innerHTML=`${renderBG()}<div style="max-width:1120px;margin:0 auto;padding:12px 12px 24px;display:flex;flex-direction:column;gap:10px;position:relative;z-index:1;min-width:0">${renderHeader()}${content}<div style="margin-top:8px;font-size:10px;color:${T.muted};display:flex;justify-content:space-between"><span>LEHA.OS • ${TOOL_DEFS.length}</span><span>BLUR ON • ${T.name}</span></div></div>`;
   // bind
   app.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{ state.sort=b.dataset.sort; renderApp();
 
